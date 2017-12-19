@@ -30,10 +30,10 @@
 <body class="gray-bg">
     <!--通知消息处-->
     {% if result  %}
-        {% if result.code == 0 %}
-            <div class="alert alert-success" style="text-align: center">执行成功:<strong>{{ result.message }}</strong></div>
+        {% if result["code"] == 0 %}
+            <div class="alert alert-success" style="text-align: center">执行成功:<strong>{{ result["message"] }}</strong></div>
         {% else %}
-            <div class="alert alert-danger" style="text-align: center">执行失败:<strong>{{ result.message }}</strong></div>
+            <div class="alert alert-danger" style="text-align: center">执行失败:<strong>{{ result["message"] }}</strong></div>
         {% endif %}
     {% endif %}
 
@@ -44,7 +44,7 @@
 
                     <div class="ibox-title">
                             <ol class="breadcrumb">
-                                  <li><a href="/index_v3"><span class="g_nav_font">运维平台</span></a></li>
+                                  <li><a href="/index_v3"><span class="g_nav_font">首页</span></a></li>
                                 <li><a href="/arya/crm/asset"><span class="g_nav_font">主机管理</span></a></li>
                                   <li class="active">主机展示</li>
                                 <div class="ibox-tools">
@@ -58,12 +58,12 @@
                 {% if dashs %}
                     <div class="ibox-content">
                         <div class="text-navy" style="text-align: center; margin-bottom: 30px;">
-                            <h2>[{{ dashs.in_ip }}主机]<b>情况报表</b></h2>
+                            <h2>【{{ dashs.in_ip }}主机】<b>情况报表</b></h2>
                         </div>
                         <div class="row">
                             <div class="btn-group pull-right">
                                 <a href="/machines_dash?ip={{ dashs.in_ip }}&step_time=1800" class="btn btn-white {% if step_time == 1800 %} active {% endif %}" type="button">半小时</a>
-                                <a href="/machines_dash?ip={{ dashs.in_ip }}&step_time=3600" class="btn btn-white {% if step_time == 600 %} active {% endif %}" type="button">1小时</a>
+                                <a href="/machines_dash?ip={{ dashs.in_ip }}&step_time=3600" class="btn btn-white {% if step_time == 3600 %} active {% endif %}" type="button">1小时</a>
                                 <a href="/machines_dash?ip={{ dashs.in_ip }}&step_time=10800" class="btn btn-white {% if step_time == 10800 %} active {% endif %}" type="button">3小时</a>
                                 <a href="/machines_dash?ip={{ dashs.in_ip }}&step_time=21600" class="btn btn-white {% if step_time == 21600 %} active {% endif %}" type="button">6小时</a>
                                 <a href="/machines_dash?ip={{ dashs.in_ip }}&step_time=43200" class="btn btn-white {% if step_time == 43200 %} active {% endif %}" type="button">12小时</a>
@@ -243,7 +243,7 @@
                         boundaryGap: false,
 
                         data: [
-                            {% for item in dashs.load.1min %}
+                            {% for item in dashs["load.1min"] %}
                                 '{{ item.timestamp }}',
                             {% endfor %}
                         ]
@@ -258,7 +258,7 @@
                             type:'line',
                             stack: '',
                             data:[
-                                {% for item in dashs.load.1min %}
+                                {% for item in dashs["load.1min"] %}
                                     '{{ item.value }}',
                                 {% endfor %}
                             ]
@@ -268,7 +268,7 @@
                             type:'line',
                             stack: '',
                             data:[
-                                {% for item in dashs.load.5min %}
+                                {% for item in dashs["load.5min"] %}
                                     '{{ item.value }}',
                                 {% endfor %}
                             ]
@@ -278,7 +278,7 @@
                             type:'line',
                             stack: '',
                             data:[
-                                {% for item in dashs.load.15min %}
+                                {% for item in dashs["load.15min"] %}
                                     '{{ item.value }}',
                                 {% endfor %}
                             ]
@@ -312,7 +312,7 @@
                         type: 'category',
                         boundaryGap: false,
                         data: [
-                            {% for item in dashs.kernel.maxfiles %}
+                            {% for item in dashs["kernel.maxfiles"] %}
                                     '{{ item.timestamp }}',
                                 {% endfor %}
                         ]
@@ -326,7 +326,7 @@
                             type:'line',
                             stack: '',
                             data:[
-                                {% for item in dashs.kernel.maxfiles %}
+                                {% for item in dashs["kernel.maxfiles"] %}
                                     '{{ item.value }}',
                                 {% endfor %}
                             ]
@@ -336,7 +336,7 @@
                             type:'line',
                             stack: '',
                             data:[
-                                {% for item in dashs.kernel.files.allocated %}
+                                {% for item in dashs["kernel.files.allocated"] %}
                                     '{{ item.value }}',
                                 {% endfor %}
                             ]
@@ -371,7 +371,7 @@
                             boundaryGap: false,
 
                             data: [
-                                {% for item in dashs.cpu.user %}
+                                {% for item in dashs["cpu.user"] %}
                                     '{{ item.timestamp }}',
                                 {% endfor %}
                             ]
@@ -386,7 +386,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.cpu.system %}
+                                    {% for item in dashs["cpu.system"] %}
                                         '{{ item.value }}',
                                     {% endfor %}
                                 ]
@@ -396,7 +396,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.load.5min %}
+                                    {% for item in dashs["load.5min"] %}
                                         '{{ item.value }}',
                                     {% endfor %}
                                 ]
@@ -406,7 +406,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.cpu.nice %}
+                                    {% for item in dashs["cpu.nice"] %}
                                         '{{ item.value }}',
                                     {% endfor %}
                                 ]
@@ -416,7 +416,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.cpu.idle %}
+                                    {% for item in dashs["cpu.idle"] %}
                                         '{{ item.value }}',
                                     {% endfor %}
                                 ]
@@ -451,7 +451,7 @@
                             boundaryGap: false,
 
                             data: [
-                                {% for item in dashs.cpu.user %}
+                                {% for item in dashs["cpu.user"] %}
                                     '{{ item.timestamp }}',
                                 {% endfor %}
                             ]
@@ -466,7 +466,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.cpu.iowait %}
+                                    {% for item in dashs["cpu.iowait"] %}
                                         '{{ item.value }}',
                                     {% endfor %}
                                 ]
@@ -476,7 +476,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.load.softirq %}
+                                    {% for item in dashs["load.softirq"] %}
                                         '{{ item.value }}',
                                     {% endfor %}
                                 ]
@@ -486,7 +486,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.cpu.switches %}
+                                    {% for item in dashs["cpu.switches"] %}
                                         '{{ item.value }}',
                                     {% endfor %}
                                 ]
@@ -496,7 +496,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.cpu.steal %}
+                                    {% for item in dashs["cpu.steal"] %}
                                         '{{ item.value }}',
                                     {% endfor %}
                                 ]
@@ -506,7 +506,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.cpu.irq %}
+                                    {% for item in dashs["cpu.irq"] %}
                                         '{{ item.value }}',
                                     {% endfor %}
                                 ]
@@ -540,7 +540,7 @@
                             boundaryGap: false,
 
                             data: [
-                                {% for item in dashs.mem.memtotal %}
+                                {% for item in dashs["mem.memtotal"] %}
                                     '{{ item.timestamp }}',
                                 {% endfor %}
                             ]
@@ -555,8 +555,8 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.mem.memused %}
-                                        '{{ item.value }} ',
+                                    {% for item in dashs["mem.memused"] %}
+                                        '{{ item.value  /1024/ 1024 /1024}} ',
                                     {% endfor %}
                                 ]
                             },
@@ -565,8 +565,8 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.mem.memtotal %}
-                                        '{{ item.value | filesizeformat  }}',
+                                    {% for item in dashs["mem.memtotal"] %}
+                                        '{{ item.value  /1024 /1024 /1024 }}',
                                     {% endfor %}
                                 ]
                             },
@@ -599,7 +599,7 @@
                             boundaryGap: false,
 
                             data: [
-                                {% for item in dashs.ss.closed %}
+                                {% for item in dashs["ss.closed"] %}
                                     '{{ item.timestamp }}',
                                 {% endfor %}
                             ]
@@ -614,7 +614,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.ss.closed %}
+                                    {% for item in dashs["ss.closed"] %}
                                         {% if item.value %}
                                             '{{ item.value }}',
                                         {% else %}
@@ -628,7 +628,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.ss.estab %}
+                                    {% for item in dashs["ss.estab"] %}
                                        {% if item.value %}
                                             '{{ item.value }}',
                                         {% else %}
@@ -642,7 +642,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.ss.orphaned %}
+                                    {% for item in dashs["ss.orphaned"] %}
                                        {% if item.value %}
                                             '{{ item.value }}',
                                         {% else %}
@@ -656,7 +656,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.ss.synrecv %}
+                                    {% for item in dashs["ss.synrecv"] %}
                                        {% if item.value %}
                                             '{{ item.value }}',
                                         {% else %}
@@ -670,7 +670,7 @@
                                 type:'line',
                                 stack: '',
                                 data:[
-                                    {% for item in dashs.ss.timewait %}
+                                    {% for item in dashs["ss.timewait"] %}
                                         {% if item.value %}
                                             '{{ item.value }}',
                                         {% else %}
@@ -691,13 +691,13 @@
                         },
                         legend: {
                             data:[
-                                {% if dashs.net.if.out.bytes/iface=eth0 %}
+                                {% if dashs["net.if.out.bytes/iface=eth0"] %}
                                         'eth0',
-                                {% elif dashs.net.if.out.bytes/iface=eth1 %}
+                                {% elif dashs["net.if.out.bytes/iface=eth1"] %}
                                         'eth1',
-                                {% elif dashs.net.if.out.bytes/iface=eth2 %}
+                                {% elif dashs["net.if.out.bytes/iface=eth2"] %}
                                         'eth2',
-                                {% elif dashs.net.if.out.bytes/iface=eth3 %}
+                                {% elif dashs["net.if.out.bytes/iface=eth3"] %}
                                         'eth3',
                                 {% endif %}
                             ]
@@ -718,20 +718,20 @@
                             boundaryGap: false,
 
                             data: [
-                                 {% if dashs.net.if.in.bytes/iface=eth0 %}
-                                    {% for item in dashs.net.if.out.bytes/iface=eth0 %}
+                                 {% if dashs["net.if.in.bytes/iface=eth0"] %}
+                                    {% for item in dashs["net.if.out.bytes/iface=eth0"] %}
                                         '{{ item.timestamp }}',
                                     {% endfor %}
-                                {% elif dashs.net.if.in.bytes/iface=eth1 %}
-                                    {% for item in dashs.net.if.out.bytes/iface=eth1 %}
+                                {% elif dashs["net.if.in.bytes/iface=eth1"] %}
+                                    {% for item in dashs["net.if.out.bytes/iface=eth1"] %}
                                         '{{ item.timestamp }}',
                                     {% endfor %}
-                                {% elif dashs.net.if.in.bytes/iface=eth2 %}
-                                    {% for item in dashs.net.if.out.bytes/iface=eth2 %}
+                                {% elif dashs["net.if.in.bytes/iface=eth2"] %}
+                                    {% for item in dashs["net.if.out.bytes/iface=eth2"] %}
                                         '{{ item.timestamp }}',
                                     {% endfor %}
-                                {% elif dashs.net.if.in.bytes/iface=eth3 %}
-                                    {% for item in dashs.net.if.out.bytes/iface=eth3 %}
+                                {% elif dashs["net.if.in.bytes/iface=eth3"] %}
+                                    {% for item in dashs["net.if.out.bytes/iface=eth3"] %}
                                         '{{ item.timestamp }}',
                                     {% endfor %}
                                 {% endif %}
@@ -742,15 +742,15 @@
                             type: 'value'
                         },
                         series: [
-                            {% if dashs.net.if.in.bytes/iface=eth0 %}
+                            {% if dashs["net.if.in.bytes/iface=eth0"] %}
                                 {
                                     name:'eth0-in',
                                     type:'line',
                                     stack: '',
                                     data:[
-                                        {% for item in dashs.net.if.in.bytes/iface=eth0 %}
+                                        {% for item in dashs["net.if.in.bytes/iface=eth0"] %}
                                            {% if item.value %}
-                                               '{{ item.value | filesizeformat  }}',
+                                               '{{ item.value  /1024 /1024 }}',
                                             {% else %}
                                                 '0',
                                             {% endif %}
@@ -759,15 +759,15 @@
                                 },
                             {% endif %}
 
-                            {% if dashs.net.if.in.bytes/iface=eth1 %}
+                            {% if dashs["net.if.in.bytes/iface=eth1"] %}
                                 {
                                     name:'eth1-in',
                                     type:'line',
                                     stack: '',
                                     data:[
-                                        {% for item in dashs.net.if.in.bytes/iface=eth1 %}
+                                        {% for item in dashs["net.if.in.bytes/iface=eth1"] %}
                                             {% if item.value %}
-                                               '{{ item.value | filesizeformat  }}',
+                                               '{{ item.value /1024 /1024 }}',
                                             {% else %}
                                                 '0',
                                             {% endif %}
@@ -776,15 +776,15 @@
                                 },
                             {% endif %}
 
-                            {% if dashs.net.if.in.bytes/iface=eth2 %}
+                            {% if dashs["net.if.in.bytes/iface=eth2"] %}
                                 {
                                     name:'eth2-in',
                                     type:'line',
                                     stack: '',
                                     data:[
-                                        {% for item in dashs.net.if.in.bytes/iface=eth2 %}
+                                        {% for item in dashs["net.if.in.bytes/iface=eth2"] %}
                                             {% if item.value %}
-                                               '{{ item.value  | filesizeformat  }}',
+                                               '{{ item.value  /1024 /1024 }}',
                                             {% else %}
                                                 '0',
                                             {% endif %}
@@ -793,15 +793,15 @@
                                 },
                             {% endif %}
 
-                            {% if dashs.net.if.in.bytes/iface=eth3 %}
+                            {% if dashs["net.if.in.bytes/iface=eth3"] %}
                                 {
                                     name:'eth3-in',
                                     type:'line',
                                     stack: '',
                                     data:[
-                                        {% for item in dashs.net.if.in.bytes/iface=eth3 %}
+                                        {% for item in dashs["net.if.in.bytes/iface=eth3"] %}
                                             {% if item.value %}
-                                               '{{ item.value  | filesizeformat  }}',
+                                               '{{ item.value  /1024 /1024 }}',
                                             {% else %}
                                                 '0',
                                             {% endif %}
@@ -821,13 +821,13 @@
                         },
                         legend: {
                             data:[
-                                {% if dashs.net.if.out.bytes/iface=eth0 %}
+                                {% if dashs["net.if.out.bytes/iface=eth0"] %}
                                         'eth0',
-                                {% elif dashs.net.if.out.bytes/iface=eth1 %}
+                                {% elif dashs["net.if.out.bytes/iface=eth1"] %}
                                         'eth1',
-                                {% elif dashs.net.if.out.bytes/iface=eth2 %}
+                                {% elif dashs["net.if.out.bytes/iface=eth2"] %}
                                         'eth2',
-                                {% elif dashs.net.if.out.bytes/iface=eth3 %}
+                                {% elif dashs["net.if.out.bytes/iface=eth3"] %}
                                         'eth3',
                                 {% endif %}
                             ]
@@ -848,20 +848,20 @@
                             boundaryGap: false,
 
                             data: [
-                                {% if dashs.net.if.out.bytes/iface=eth0 %}
-                                    {% for item in dashs.net.if.out.bytes/iface=eth0 %}
+                                {% if dashs["net.if.out.bytes/iface=eth0"] %}
+                                    {% for item in dashs["net.if.out.bytes/iface=eth0"] %}
                                         '{{ item.timestamp }}',
                                     {% endfor %}
-                                {% elif dashs.net.if.out.bytes/iface=eth1 %}
-                                    {% for item in dashs.net.if.out.bytes/iface=eth1 %}
+                                {% elif dashs["net.if.out.bytes/iface=eth1"] %}
+                                    {% for item in dashs["net.if.out.bytes/iface=eth1"] %}
                                         '{{ item.timestamp }}',
                                     {% endfor %}
-                                {% elif dashs.net.if.out.bytes/iface=eth2 %}
-                                    {% for item in dashs.net.if.out.bytes/iface=eth2 %}
+                                {% elif dashs["net.if.out.bytes/iface=eth2"] %}
+                                    {% for item in dashs["net.if.out.bytes/iface=eth2"] %}
                                         '{{ item.timestamp }}',
                                     {% endfor %}
-                                {% elif dashs.net.if.out.bytes/iface=eth3 %}
-                                    {% for item in dashs.net.if.out.bytes/iface=eth3 %}
+                                {% elif dashs["net.if.out.bytes/iface=eth3"] %}
+                                    {% for item in dashs["net.if.out.bytes/iface=eth3"] %}
                                         '{{ item.timestamp }}',
                                     {% endfor %}
                                 {% endif %}
@@ -873,15 +873,15 @@
                             type: 'value'
                         },
                         series: [
-                            {% if dashs.net.if.out.bytes/iface=eth0 %}
+                            {% if dashs["net.if.out.bytes/iface=eth0"] %}
                                 {
                                     name:'eth0-out',
                                     type:'line',
                                     stack: '',
                                     data:[
-                                        {% for item in dashs.net.if.out.bytes/iface=eth0 %}
+                                        {% for item in dashs["net.if.out.bytes/iface=eth0"] %}
                                            {% if item.value %}
-                                               '{{ item.value | filesizeformat  }}',
+                                               '{{ item.value /1024 /1024 }}',
                                             {% else %}
                                                 '0',
                                             {% endif %}
@@ -890,15 +890,15 @@
                                 },
                             {% endif %}
 
-                            {% if dashs.net.if.out.bytes/iface=eth1 %}
+                            {% if dashs["net.if.out.bytes/iface=eth1"] %}
                                 {
                                     name:'eth1-out',
                                     type:'line',
                                     stack: '',
                                     data:[
-                                        {% for item in dashs.net.if.out.bytes/iface=eth1 %}
+                                        {% for item in dashs["net.if.out.bytes/iface=eth1"] %}
                                             {% if item.value %}
-                                                '{{ item.value  | filesizeformat  }}',
+                                                '{{ item.value  /1024 /1024 }}',
                                             {% else %}
                                                 '0',
                                             {% endif %}
@@ -907,15 +907,15 @@
                                 },
                             {% endif %}
 
-                            {% if dashs.net.if.out.bytes/iface=eth2 %}
+                            {% if dashs["net.if.out.bytes/iface=eth2"] %}
                                 {
                                     name:'eth2-out',
                                     type:'line',
                                     stack: '',
                                     data:[
-                                        {% for item in dashs.net.if.out.bytes/iface=eth2 %}
+                                        {% for item in dashs["net.if.out.bytes/iface=eth2"] %}
                                             {% if item.value %}
-                                               '{{ item.value | filesizeformat  }}',
+                                               '{{ item.value /1024 /1024 }}',
                                             {% else %}
                                                 '0',
                                             {% endif %}
@@ -925,15 +925,15 @@
                                 },
                             {% endif %}
 
-                            {% if dashs.net.if.out.bytes/iface=eth3 %}
+                            {% if dashs["net.if.out.bytes/iface=eth3"] %}
                                 {
                                     name:'eth3-out',
                                     type:'line',
                                     stack: '',
                                     data:[
-                                        {% for item in dashs.net.if.out.bytes/iface=eth3 %}
+                                        {% for item in dashs["net.if.out.bytes/iface=eth3"] %}
                                             {% if item.value %}
-                                               '{{ item.value | filesizeformat  }}',
+                                               '{{ item.value /1024 /1024 }}',
                                             {% else %}
                                                 '0',
                                             {% endif %}

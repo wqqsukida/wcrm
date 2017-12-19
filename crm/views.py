@@ -103,7 +103,7 @@ def index(request):
 
 def index_v3(request):
     return render(request,'index_v3.html')
-
+from django.template.loader import render_to_string
 def machines_dash(request):
     result = {}
     dashs = {}
@@ -117,12 +117,14 @@ def machines_dash(request):
 
     if not in_ip:
         result = {"code":1,"message":"未提供IP地址"}
-        return render(request,'machines_dash.html',{'result':result, 'dashs':dashs, 'step_time':step_time})
+        # return render_to_string('machines_dash.html', context={'result':result, 'dashs':dashs, 'step_time':step_time}, request=request, )
+        return render(request,'machines_dash.html',{'result':result, 'dashs':dashs, 'step_time':step_time},using='jinja2')
 
     dashs = c.dash(in_ip, step_time)
     if not dashs:
         result = {"code":1,"message":"此台机器未进行监控"}
-        return render(request,'machines_dash.html',{'result':result, 'dashs':dashs, 'step_time':step_time})
+        # return render_to_string('machines_dash.html', context={'result':result, 'dashs':dashs, 'step_time':step_time}, request=request, )
+        return render(request,'machines_dash.html',{'result':result, 'dashs':dashs, 'step_time':step_time},using='jinja2')
 
-
-    return render(request,'machines_dash.html',{'result':result, 'dashs':dashs, 'step_time':step_time})
+    # return render_to_string('machines_dash.html', context={'result':result, 'dashs':dashs, 'step_time':step_time}, request=request, )
+    return render(request,'machines_dash.html',{'result':result, 'dashs':dashs, 'step_time':step_time},using='jinja2')
