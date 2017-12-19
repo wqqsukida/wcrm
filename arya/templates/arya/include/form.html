@@ -1,0 +1,21 @@
+<form role="form" method="post" novalidate>
+    {% csrf_token %}
+    {% for item in form %}
+    <div class="form-group col-sm-12" style="margin-bottom: 20px;">
+        <div class="col-sm-3">
+            <h4 style="float:right;">{{ item.label }}:</h4>
+        </div>
+        <div class="col-sm-6" style="position: relative">
+            <!-- <input type="email" class="form-control" id="inputEmail3" placeholder="Email"> -->
+            {{ item }}
+            <div style="position: absolute;color: red">{{ item.errors.0 }}</div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="form-group col-sm-12">
+        <div class="col-sm-5"> </div>
+        <a href="{{ red_url }}"><div class="btn btn-default creat-btn" id="create-btn">返回</div></a>
+        <button type="submit" class="btn btn-info creat-btn" id="create-btn">提交</button>
+    </div>
+</form>

@@ -1,0 +1,24 @@
+{% extends "arya/layout.html" %}
+
+{% block content %}
+<div class="middle-box text-center animated fadeInDown">
+{#    <h1>403</h1>#}
+{#    <h3 class="font-bold">forbidden！</h3>#}
+{##}
+{#    <div class="error-desc">#}
+{#        抱歉，该页面没有权限访问~#}
+{#    </div>#}
+{#    <div>#}
+{#        <br>#}
+{#        <a type="#" onclick="history.go(-1)" class="btn btn-primary">返回</a>#}
+{##}
+{#    </div>#}
+    <h2>是否确定删除</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <a onclick="history.go(-1)" class="btn btn-default">返回</a>
+        <input type="submit" class="btn btn-danger" value="确定" />
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "arya/layout.html" %}
+
+{% block content %}
+<div class="col-sm-12">
+    <div class="ibox">
+        <div class="ibox-title">
+            <h5><a href="/index_v3/">首页</a><B style="color:#ccc">/</B> 编辑数据 </h5>
+            <div class="ibox-tools">
+                <a class="btn btn-danger btn-xs" onclick="history.go(-1)"><span style="color: white">返回上一级</span></a>
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a onclick="window.location.reload()">
+                    <i class="fa fa-refresh"></i>
+                </a>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <div class="panel-body">
+            {% include 'arya/include/form.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
