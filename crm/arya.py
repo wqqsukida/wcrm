@@ -149,7 +149,7 @@ class NewChangeList(v1.ChangeList):
                 if isinstance(str_func, str):
                     if str_func == 'ip':
                         url = '/machines_dash?ip=' + getattr(obj, str_func)
-                        col = mark_safe('<a href="{0}">{1}</a>'.format(url,getattr(obj, str_func)))
+                        col = mark_safe('<button title="主机详情" class="btn btn-default btn-outline btn-xs"><a href="{0}">{1}</a></button>'.format(url,getattr(obj, str_func)))
                     else:
                         col = getattr(obj, str_func)
                 else:

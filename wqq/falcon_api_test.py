@@ -5,7 +5,7 @@ import json
 import time
 import requests
 
-in_ip = '192.168.67.129'
+in_ip = '192.168.67.130'
 user = 'root'
 sig = '5dfd815de3ce11e7b107000c298269bc'
 domain = 'http://192.168.67.129:8080'
