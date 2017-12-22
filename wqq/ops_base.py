@@ -14,12 +14,12 @@ class OpsMachineInfo():
         print (status,data)
         if not status or not data:
             return {}
-        point_id = data[0]["id"]
+        point_id = data[0]["id"]    # 得到eid
 
         status, counters = f.req_api(directiry="/api/v1/graph/endpoint_counter?eid={0}".format(point_id), method="get")
         if not status:
             return {}
-        counters = [ counter["counter"] for counter in counters ]
+        counters = [ counter["counter"] for counter in counters ]    # 得到具体监控项
 
         end_time = int(time.time()) # 必须要整形
         start_time = end_time - step_time # 30分钟
@@ -32,11 +32,12 @@ class OpsMachineInfo():
            "counters": counters,
            "consol_fun": "AVERAGE"
            }
+        # 得到指定监控项的历史记录
         status, data = f.req_api(directiry="/api/v1/graph/history", method="post", payload=payload)
         if not status:
             return {}
 
-
+        # ===============格式化数据==========================================
         data = dict([ (iter["counter"], iter["Values"] ) for iter in data ])
 
         for key in data:
