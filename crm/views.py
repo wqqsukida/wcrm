@@ -128,3 +128,6 @@ def machines_dash(request):
 
     # return render_to_string('machines_dash.html', context={'result':result, 'dashs':dashs, 'step_time':step_time}, request=request, )
     return render(request,'machines_dash.html',{'result':result, 'dashs':dashs, 'step_time':step_time},using='jinja2')
+
+def userinfo(request):
+    return HttpResponse(json.dumps(dict(code=0, message="用户信息页面")))

@@ -22,7 +22,8 @@ jQuery(function($){
         slides             : [    // Slideshow Images
                                  {image : '/static/img/login_img/backgrounds/1.jpg'},
                                  {image : '/static/img/login_img/backgrounds/2.jpg'},
-                                 {image : '/static/img/login_img/backgrounds/3.jpg'}
+                                 {image : '/static/img/login_img/backgrounds/3.jpg'},
+                                 {image : '/static/img/login_img/backgrounds/4.jpg'}
                              ]
 
     });

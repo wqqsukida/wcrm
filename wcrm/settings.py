@@ -148,6 +148,7 @@ VALID_URL= [
     '^/index_v3/',
     '^/403/',
     '^/logout/',
+    '^/userinfo/',
     # '^/machines_dash/',
 ]
 
