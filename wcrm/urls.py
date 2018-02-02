@@ -29,4 +29,5 @@ urlpatterns = [
     url(r'^403/', views.forbidden),
     url(r'^machines_dash/', views.machines_dash),
     url(r'^userinfo/', views.userinfo),
+    url(r'^get_cert_detail/', views.get_cert_detail),
 ]

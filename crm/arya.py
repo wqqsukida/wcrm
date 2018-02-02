@@ -261,3 +261,103 @@ class BussinessLineConfig(Permission_Config,v1.AryaConfig):
     model_form_class = BussinessLineModelForm
 
 v1.site.register(models.BussinessLine, BussinessLineConfig)
+
+########################### BussinessLine ###########################
+class DomainTopModelForm(ModelForm):
+    class Meta:
+        model = models.DomainTop
+        fields = "__all__"
+        widgets = {
+            'domain_name':form_widgets.TextInput(attrs={'class':'form-control'}),
+            'creation_date':form_widgets.DateTimeInput(attrs={'class':'form-control'}),
+            'expiration_date':form_widgets.DateTimeInput(attrs={'class':'form-control'}),
+            'icp_num': form_widgets.TextInput(attrs={'class': 'form-control'}),
+            'gongan_num': form_widgets.TextInput(attrs={'class': 'form-control'}),
+            'ssl_creation_date':form_widgets.DateInput(attrs={'class': 'form-control'}),
+            'ssl_expiration_date':form_widgets.DateInput(attrs={'class': 'form-control'}),
+            'ssl_brand': form_widgets.TextInput(attrs={'class': 'form-control'}),
+            'ssl_proxy': form_widgets.TextInput(attrs={'class': 'form-control'}),
+            'is_public': form_widgets.NullBooleanSelect(attrs={'class': 'form-control'}),
+        }
+        error_messages = {
+            'domain_name':{
+                'required':'*名称不能为空'
+            },
+        }
+
+class DTChangeList(v1.ChangeList):
+    '''
+    重写table_body方法，添加一个可以获取域名证书信息的按钮
+    '''
+    def table_body(self):
+        table_data = []
+        for obj in self.queryset:
+            row = []
+            for str_func in self.list_display:
+                if isinstance(str_func, str):
+                    if str_func == 'domain_name':
+                        # url = '/machines_dash?ip=' + getattr(obj, str_func)
+                        col = mark_safe('''
+                                <a title="获取证书信息" class="btn btn-success btn-xs get_cert_detail"
+                                style="border-radius: 10px;">
+                                    {0}
+                                </a>
+                        '''.format(getattr(obj, str_func)))
+                    else:
+                        col = getattr(obj, str_func)
+                else:
+                    col = str_func(self.config, obj)
+                row.append(col)
+            table_data.append(row)
+        # print(table_data)
+        return table_data
+
+class DomainTopConfig(Permission_Config,v1.AryaConfig):
+
+    def changelist_view(self,request):
+
+        # UserInfoConfig对象 =  self
+        # UserTypeConfig对象 =  self
+        self.request = request
+        if request.method == "POST":
+            action_item_name = request.POST.get('select_ac') # multi_init /multi_delete
+            if action_item_name:
+                func = getattr(self,action_item_name)
+                func(request)
+
+        from django.db.models import Q
+        condition = Q()
+        search_q = request.GET.get('q')
+        search_list = self.get_search_list() # [name__contains,pwd]
+
+        if search_q and search_list:
+            for field in search_list:
+                temp = Q()
+                convert_type = field.get('type')
+                if convert_type:
+                    try:
+                        search_q = convert_type(search_q)
+                    except Exception as e:
+                        continue
+                temp.children.append((field.get('k'),search_q))
+                condition.add(temp,'OR')
+
+        queryset = self.model_class.objects.filter(condition)
+
+        cl = DTChangeList(self,queryset)
+
+        from django.http.request import QueryDict
+        url_obj = QueryDict(mutable=True)
+        url_obj['_getarg'] = request.GET.urlencode()
+        # print(url_obj.urlencode())
+        url_param = url_obj.urlencode()
+
+        return render(request,'arya/changelist.html',{'cl':cl,'url_param':url_param})
+
+
+    list_display = ['domain_name','creation_date','expiration_date',
+                    'icp_num','gongan_num','ssl_creation_date','ssl_expiration_date','ssl_brand',
+                    'ssl_proxy','is_public']
+    model_form_class = DomainTopModelForm
+
+v1.site.register(models.DomainTop, DomainTopConfig)

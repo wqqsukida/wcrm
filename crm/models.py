@@ -67,3 +67,18 @@ class AssetDetail(models.Model):
     osver = models.CharField(max_length=32,null=True)
     cpu_num = models.CharField(max_length=10,null=True)
     ip = models.CharField(max_length=32)
+
+class DomainTop(models.Model):
+    '''
+    顶级域名表
+    '''
+    domain_name = models.CharField(verbose_name="一级域名名称",max_length=255,unique=True)
+    creation_date = models.DateTimeField(verbose_name="域名创建时间",null=True,blank=True,default=None)
+    expiration_date = models.DateTimeField(verbose_name="域名过期时间",null=True,blank=True,default=None)
+    icp_num = models.CharField(verbose_name="ICP备案",max_length=255,null=True,blank=True,default=None)
+    gongan_num = models.CharField(verbose_name="公安备案",max_length=255,null=True,blank=True,default=None)
+    ssl_creation_date = models.DateField(verbose_name="证书创建时间",null=True,blank=True,default=None)
+    ssl_expiration_date = models.DateField(verbose_name="证书过期时间",null=True,blank=True,default=None)
+    ssl_brand = models.CharField(verbose_name="证书品牌", max_length=255,null=True,blank=True,default=None)
+    ssl_proxy = models.CharField(verbose_name="证书代理", max_length=255,null=True,blank=True,default=None)
+    is_public = models.BooleanField(verbose_name="是否是公网域名",default=1) # 1：公网 0：内网

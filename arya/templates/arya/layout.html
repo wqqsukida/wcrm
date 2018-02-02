@@ -30,6 +30,25 @@
         </div>
     </div>
 
+    <div class="modal fade" id="detail_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 700px">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: lightsteelblue;">
+                    <button type="button" class="close close_detail_modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">证书信息</h4>
+                </div>
+                <div class="panel-body" style="background-color: lightblue;font-size: 15px;font-weight: 600">
+                    <div class="col-sm-12">
+                        <table class="table table-striped table-bordered table-hover dataTables-example cret-table">
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade in" style="display: none"></div>
+
     <script src="/static/js/jquery.min.js?v=2.1.4"></script>
     <script src="/static/js/bootstrap.min.js?v=3.3.6"></script>
     <script src="/static/js/plugins/jeditable/jquery.jeditable.js"></script>
@@ -38,6 +57,7 @@
     <script src="/static/js/content.min.js?v=1.0.0"></script>
     <script src="/static/js/plugins/layer/layer.min.js"></script>
     <script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+    <script src="/static/js/plugins/loading/loading.js"></script>
 {#    <script>#}
 {#    {% if result %}#}
 {#    swal("{{ result }}");#}
@@ -76,6 +96,56 @@
 {#                });#}
 {#             });#}
 {#    </script>#}
+    <script>
+        $('table').on('click','.get_cert_detail',function () {
+            //获取域名变量
+            var $domain = $(this).text();
+            console.log($domain);
+            //清空模态框
+            $('.cret-table').empty();
+            //显示遮罩层
+            $('.modal-backdrop').css('display', 'block');
+            //显示加载中...
+            $.bootstrapLoading.start({ loadingTips: "正在处理数据，请稍候..." });
+            //发起异步请求
+            $.ajax({
+                url:"/get_cert_detail/",
+                type:"POST",
+                data:{domain:$domain},
+                dataType:'JSON',
+                success:function (arg) {
+                    //console.log(arg);
+                    if(arg['val']){
+                        console.log(arg);
+                        $.each(arg['val'],function(k,v){
+                            $('.cret-table').append(v)
+                        });
+
+{#                        $('dl dd').each(function (k) {#}
+{#                            var $domain_detail = [arg.CN,domain,arg.end_time];#}
+{#                            $(this).text($domain_detail[k]);   //在前端页面上显示更改的数据#}
+{#                        });#}
+                    }else{
+                        console.log('failed!!!');
+                        $('.cret-table').append("<h3 style='color:red'>没有获取到任何信息！</h3>")
+                    }
+                },
+                complete:function () {
+                    $.bootstrapLoading.end();
+                    //显示模态框
+                    $('#detail_modal').addClass('in');
+                    $('#detail_modal').css({display: 'block', overflow: 'auto'});
+                }
+            });
+        });
+
+        $('.close_detail_modal').click(function () {
+		    $("#detail_modal").css('display','none');
+		    $("#detail_modal").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+
+        });
+    </script>
 
 </body>
 </html>

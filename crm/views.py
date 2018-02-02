@@ -130,4 +130,23 @@ def machines_dash(request):
     return render(request,'machines_dash.html',{'result':result, 'dashs':dashs, 'step_time':step_time},using='jinja2')
 
 def userinfo(request):
-    return HttpResponse(json.dumps(dict(code=0, message="用户信息页面")))
+    return (json.dumps(dict(code=0, message="用户信息页面")))
+
+
+
+from utils import get_cert
+def get_cert_detail(request):
+    '''
+    获取域名证书信息方法
+    :param request:
+    :return:
+    '''
+    domain_detail ={}
+    if request.method == "POST":
+
+        domain = request.POST.get('domain')
+        #print(domain)
+        domain_detail['val'] = get_cert.get_cert(domain)
+        #print(domain_detail)
+
+    return HttpResponse(json.dumps(domain_detail),content_type="application/json")
