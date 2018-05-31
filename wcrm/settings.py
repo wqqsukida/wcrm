@@ -150,6 +150,11 @@ VALID_URL= [
     '^/logout/',
     '^/userinfo/',
     '^/get_cert_detail/',
+    '^/dnspod/',
+    '^/dnspod/add_domain/',
+    '^/dnspod_record/',
+    '^/dnspod_d/',
+    '^/dnspod_d/gethistory_monitor/',
 ]
 
 #===============falcon-api====================

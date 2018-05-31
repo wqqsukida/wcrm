@@ -9,7 +9,7 @@ from utils.md5 import encrypt
 from django.forms import Form,fields,widgets
 from wqq.ops_base import *
 from .models import *
-
+from django.urls import reverse
 ############################取消装饰器在中间件里验证登录session##############
 def auth(func):
     '''
@@ -144,9 +144,159 @@ def get_cert_detail(request):
     domain_detail ={}
     if request.method == "POST":
 
-        domain = request.POST.get('domain')
+        domain = request.POST.get('domain').strip()
         #print(domain)
         domain_detail['val'] = get_cert.get_cert(domain)
         #print(domain_detail)
 
     return HttpResponse(json.dumps(domain_detail),content_type="application/json")
+
+from utils.dnspod.domain import Domain
+from utils.dnspod import record
+from utils.dnspod import dmonitor
+#========================================================================
+def dnspod(request):
+    '''
+    获取dnspod域名列表
+    :return:
+    '''
+    d_obj = Domain()
+    group_id = request.GET.get("group_id","")
+    groups = d_obj.group_list().get('groups',[])
+    domain_list = d_obj.list(group_id=group_id)
+    result = {}
+
+    status = request.GET.get("status", "")
+    message = request.GET.get("message", "")
+    if status.isdigit():
+        result = {"code":int(status),"message":message}
+
+    return render(request,"dnspod.html",{"domain_list":domain_list,
+                                         "result":result,
+                                         "groups":groups,
+                                         "group_id":group_id
+                                         },using='jinja2')
+
+def add_domain(request):
+    '''
+    添加dnspod域名
+    :return:
+    '''
+    d_obj = Domain()
+    result= {}
+    # if request.method == "GET":
+    #     group_list = d_obj.group_list()
+    #     # 获取所有group_id
+    #     ids = [{"group_id":g.get("group_id",""),"group_name":g.get("group_name","")}
+    #            for g in group_list.get('groups',[])]
+    #     # print ids
+    #     return jsonify(ids)
+
+    if request.method == "POST":
+        domain = request.POST.get("domain","")
+        group_id = request.POST.get("group_id","")
+        ismark = request.POST.get("ismark","")
+
+        status,data = d_obj.create(domain,group_id,ismark)
+        if status:
+            result = {"code":0,"message":data['status']['message']}
+        else:
+            result = {"code":1,"message":data}
+
+        return HttpResponseRedirect('/dnspod/?status={0}&message={1}'.
+                                    format(result.get("code", ""),
+                                           result.get("message", "")))
+        # return HttpResponseRedirect(reverse("dnspod",
+        #                             kwargs={"status":result.get("code", ""),
+        #                                     "message":result.get("message", "")}))
+    else:
+        return HttpResponse(json.dumps(dict(code=1,message="please use get/post method!")))
+
+#=====================记录相关================================
+def dnspod_record(request):
+    '''
+    获取dnspod域名的记录列表
+    :return:
+    '''
+    result = {}
+    record_list = []
+    domain_info = {"id":"","name":""}
+
+    status = request.GET.get("status", "")
+    message = request.GET.get("message", "")
+    if status.isdigit():
+        result = {"code":int(status),"message":message}
+
+    if request.method == "GET":
+        domain_id = request.GET.get("domain_id", "")
+        r_obj = record.Record(domain_id=domain_id)
+        status_val,data = r_obj.list()
+        if status_val:
+            record_list = data.get("records",[])
+            domain_info = data.get("domain",{"id":"","name":""})
+        else:
+            result = {"code": 1, "message": data}
+        types = record.RECORD_TYPE
+        lines = record.RECORD_LINE
+
+        return render(request,"dnspod_record.html",
+                      {"record_list":record_list,
+                      "domain_info":domain_info,
+                      "types":types,
+                      "lines":lines,
+                      "result":result
+                      },using='jinja2')
+    else:
+        return HttpResponse(json.dumps(dict(code=1,message="please use get method!")))
+
+#==========================D监控相关===============
+def dnspod_d(request):
+    result = {}
+    monitors = []
+    status = request.GET.get("status", "")
+    message = request.GET.get("message", "")
+
+    if status.isdigit():
+        result = {"code":int(status),"message":message}
+
+    if request.method == "GET":
+        dm_obj = dmonitor.DMonitor()
+        status_val, data = dm_obj.list()
+        if status_val:
+            monitors = data.get("monitors",[])
+        else:
+            result = {"code": 1, "message": data}
+
+        return render(request,"dnspod_monitors.html",
+                      {"monitors":monitors,"result":result},using='jinja2')
+
+def gethistory_monitor(request):
+    '''
+    获取监控历史
+    :return:
+    '''
+    result = {}
+    dm_obj = dmonitor.DMonitor()
+
+    monitor_id = request.GET.get("monitor_id","")
+    hours = request.GET.get("hours","")
+
+    status,data = dm_obj.get_history(monitor_id=monitor_id,hours=hours) # 默认获取24小时
+
+    if status:
+        result = {"code": 0, "message": data['status']['message']}
+        dashs = data.get("monitor_history",[])
+        record_name = data['record']['sub_domain'] + '.' + data['domain']['domain']
+    else:
+        result = {"code": 1, "message": data}
+        dashs = []
+        record_name = ""
+    # return jsonify(dashs)
+
+    return render(request,'dnspod_monitor_history.html',
+                  {"result":result,
+                   "dashs":dashs,
+                   "monitor_id":monitor_id,
+                   "hours":hours,
+                   "record_name":record_name
+                   },using='jinja2')

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_data_tables.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:01 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>H+ 后台主题UI框架 - 数据表格</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="../static/favicon.ico">
+    <link href="/static/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+
+    <!-- Data Tables -->
+{#    <link href="/static/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">#}
+    <link href="/static/css/plugins/footable/footable.core.css" rel="stylesheet">
+    <link href="/static/css/animate.min.css" rel="stylesheet">
+    <link href="/static/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/css/gstyle.css" rel="stylesheet">
+    <style>
+        .l-g-menu{
+            border-radius: 3px;
+            color: inherit;
+            font-size: 17px;
+            line-height: 25px;
+            margin: 4px;
+            text-align: left;
+            font-weight: 400;
+            display: block;
+            padding: 3px 20px;
+            clear: both;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+    <!--通知消息处-->
+    {% if result  %}
+        {% if result["code"] == 0 %}
+            <div class="alert alert-success" style="text-align: center">执行成功:<strong>{{ result["message"] }}</strong></div>
+        {% else %}
+            <div class="alert alert-danger" style="text-align: center">执行失败:<strong>{{ result["message"] }}</strong></div>
+        {% endif %}
+    {% endif %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                            <ol class="breadcrumb">
+                                  <li><a href="/index_v3"><span class="g_nav_font">星云平台</span></a></li>
+                                  <li class="active">DNS管理</li>
+                                <div class="ibox-tools">
+                                    <a onclick="refresh()">
+                                        <i class="fa fa-refresh"></i>
+                                    </a>
+                                </div>
+                            </ol>
+                        </div>
+                    <div class="ibox-content">
+
+                        <div class="col-sm-8 m-b-xs">
+    {#                                 {% if admin_button %}#}
+                            <a class="btn btn-info create-domain-button">+ 添加域名</a>
+                            <a class="btn btn-info" href="/dnspod_d">D监控</a>
+                            <div class="dropdown profile-element" style="display: inline-block">
+                                <button data-toggle="dropdown" class="btn btn-white dropdown-toggle">
+                                    <span class="clear">
+                                    <span class="text-muted text-xs block">查看域名分组<b class="caret"></b></span>
+                                    </span>
+                                </button>
+                                <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                                    <li><a href="/dnspod">全部域名</a></li>
+                                    {% for g in groups %}
+                                        <li>
+                                            <span class="l-g-menu">
+                                                <a href="/dnspod?group_id={{ g.group_id }}" class="get-gname">
+                                                    {{ g.group_name }}
+                                                </a>
+                                                <a class="hide mod-group-button" style="margin-left: 5px" g_id={{ g.group_id }}><i class="fa fa-cog"></i></a>
+                                                <a class="hide del_confirm" href="/dnspod/domain_delgroup?group_id={{ g.group_id }}"><i class="fa fa-trash"></i></a>
+                                            </span>
+                                        </li>
+                                    {% endfor %}
+                                    <li class="divider"></li>
+                                    <li><a style="background: lightskyblue" id="create-group-button">+ 添加分组</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4 m-b-xs">
+                            <input type="text" class="form-control" id="filter"
+                               placeholder="搜索域名...">
+                        </div>
+
+{#                        <form class="col-sm-4  m-b-xs" id="select_group" action="/dnspod">#}
+{#                            <select name="group_id"  id="get_group" class="form-control">#}
+{#                                <option value="">---全部域名---</option>#}
+{#                                {% for g in groups %}#}
+{#                                    {% if g.group_id|string == group_id %}#}
+{#                                        <option value="{{ g.group_id }}" selected="selected">{{ g.group_name }}</option>#}
+{#                                    {% else %}#}
+{#                                        <option value="{{ g.group_id }}">{{ g.group_name }}</option>#}
+{#                                    {% endif %}#}
+{#                                {% endfor %}#}
+{#                            </select>#}
+{#                        </form>#}
+
+                        <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="20" data-filter=#filter>
+                            <thead>
+                                <tr>
+                                    <th>域名ID</th>
+                                    <th>域名</th>
+                                    <th>域名状态</th>
+                                    <th>域名分组ID</th>
+                                    <th>是否开启搜索引擎推送功能</th>
+
+                                    <th>TTL值</th>
+
+                                    <th data-hide="all">CNAME加速状态</th>
+                                    <th data-hide="all">域名备注</th>
+                                    <th data-hide="all">添加域名的时间</th>
+                                    <th data-hide="all">域名最后修改时间</th>
+                                    <th data-hide="all">punycode转码</th>
+                                    <th data-hide="all">域名扩展的状态</th>
+                                    <th data-hide="all">域名等级</th>
+                                    <th data-hide="all">是否是VIP</th>
+                                    <th data-hide="all">域名所有者</th>
+                                    <th data-hide="all">记录总条数</th>
+                                    <th data-hide="all">是否授权给安全中心</th>
+
+                                    <th>操作(状态/备注/记录/删除)</th>
+                                    <th>日志</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for d in domain_list %}
+                                    <tr>
+                                        <td>{{ d.id }}</td>
+                                        <td>
+                                            <a href="/dnspod_record?domain_id={{ d.id }}"  title="域名记录信息">
+                                                <i class="fa fa-globe" style="font-size:18px;font-weight: 500">
+                                                    {% if d.is_mark == "yes" %}
+                                                    <i class="fa fa-star" style="font-size:18px;font-weight: 500"></i>
+                                                    {{ d.name }}
+                                                    {% else %}
+                                                    {{ d.name }}
+                                                    {% endif %}
+                                                </i>
+                                            </a>
+                                        </td>
+                                        <td>{{ d.status }}</td>
+                                        <td>
+                                            <div>
+                                                <a style="font-size: 20px" class="change-group" title="点击修改分组">{{ d.group_id }}</a>
+                                            </div>
+                                        </td>
+                                        <td>
+{#                                            {{ d.searchengine_push }}#}
+                                            {% if d.searchengine_push == "no" %}
+                                                    <a class="btn-sm btn-primary js_confirm"
+                                                       href="/dnspod/domain_searchenginepush?domain_id={{ d.id }}&status=yes">开启
+                                                    </a>
+                                            {% else %}
+                                                    <a class="btn-sm btn-danger js_confirm"
+                                                       href="/dnspod/domain_searchenginepush?domain_id={{ d.id }}&status=no">关闭
+                                                    </a>
+
+                                            {% endif %}
+                                        </td>
+
+                                        <td>{{ d.ttl }}</td>
+
+                                        <td>{{ d.cname_speedup }}</td>
+                                        <td>{{ d.remark }}</td>
+                                        <td>{{ d.created_on }}</td>
+                                        <td>{{ d.updated_on }}</td>
+                                        <td>{{ d.punycode }}</td>
+                                        <td>{{ d.ext_status }}</td>
+                                        <td>{{ d.grade }}/{{ d.grade_title }}</td>
+                                        <td>{{ d.is_vip }}</td>
+                                        <td>{{ d.owner }}</td>
+                                        <td>{{ d.records }}</td>
+                                        <td>{{ d.auth_to_anquanbao }}</td>
+
+
+                                        <td style="text-align: center;font-size: 20px">
+                                            {% if d.status == "pause" %}
+                                                <a class="js_confirm" title="启用"
+                                                   href="/dnspod/domain_status?domain_id={{ d.id }}&status=enable">
+                                                    <i class="fa fa-play"></i>
+                                                </a>
+                                            {% else %}
+                                                <a class="js_confirm" title="禁用" style="color: orange"
+                                                   href="/dnspod/domain_status?domain_id={{ d.id }}&status=disable">
+                                                    <i class="fa fa-pause"></i>
+                                                </a>
+                                            {% endif %}
+{#                                            {% if admin_button %}#}
+                                            {% if d.remark %}
+                                                <a class="add_remark" did={{ d.id }} remark={{ d.remark }} title={{ d.remark }}>
+                                                    <i class="fa fa-file-text"></i>
+                                                </a>
+                                            {% else %}
+                                                <a class="add_remark" did={{ d.id }} remark="" title="点击添加备注" style="color: #adaeaf">
+                                                    <i class="fa fa-file-text"></i>
+                                                </a>
+                                            {% endif %}
+
+
+                                            <a href="/dnspod_record?domain_id={{ d.id }}" title="域名记录"><i class="fa fa-folder-open"></i></a>
+                                            <a href="/dnspod/del_domain?domain_id={{ d.id }}" title="删除域名" class="del_confirm"><i class="fa fa-trash"></i></a>
+{#                                            {% endif %}#}
+
+                                        </td>
+                                        <td>
+                                            <a class="get-log" did="{{ d.id }}">查看</a>
+                                        </td>
+                                    </tr>
+                                {%endfor%}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="7">
+                                            <ul class="pagination pull-right"></ul>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                        </table>
+
+                </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="create-domain" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close_domain_modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">添加域名</h4>
+                </div>
+                <div class="panel-body">
+                    <form action="/dnspod/add_domain" role="form" method="post" enctype="multipart/form-data">
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">域名<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="domain" placeholder="">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">组ID<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <select name="group_id"  class="form-control">
+                                    {% for g in groups %}
+                                        <option value="{{ g.group_id }}">{{ g.group_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">是否为星标<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="ismark">
+                                    <option value="yes">是</option>
+                                    <option value="no">否</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr width="100%" />
+                        <div class="col-sm-12">
+                            <div class="col-sm-5"> </div>
+                            <button type="submit" class="btn btn-primary js_confirm">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="log-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 800px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close_log_modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">域名日志</h4>
+                </div>
+                <div class="panel-body">
+                    <pre id="domain-log" style="overflow: auto; height: 380px; line-height: 20px;">
+
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mod-remark" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close_remark_modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">添加备注</h4>
+                </div>
+                <div class="panel-body">
+                    <form action="/dnspod/domain_remark" role="form" method="post" enctype="multipart/form-data">
+
+                        <div class="form-group col-sm-12" style="display: none">
+                            <div class="col-sm-3">  <h5 style="float:right;">域名ID<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="domain_id">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-12">
+                                <textarea class="form-control" type="text" name="remark" rows="5" placeholder="最大200字符，域名备注，删除备注请提交空内容">
+
+                                </textarea>
+                            </div>
+                        </div>
+
+                        <hr width="100%" />
+                        <div class="col-sm-12">
+                            <div class="col-sm-5"> </div>
+                            <button type="submit" class="btn btn-primary js_confirm">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="create-group-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close-create-group" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">添加分组</h4>
+                </div>
+                <div class="panel-body">
+                    <form action="/dnspod/domain_addgroup" role="form" method="post" enctype="multipart/form-data">
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-2">  <h5 style="float:right;">组名<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-9">
+                                <input class="form-control" type="text" name="group_name">
+                            </div>
+                        </div>
+
+                        <hr width="100%" />
+                        <div class="col-sm-12">
+                            <div class="col-sm-5"> </div>
+                            <button type="submit" class="btn btn-primary js_confirm">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mod-group-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close-mod-group" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">修改组名</h4>
+                </div>
+                <div class="panel-body">
+                    <form action="/dnspod/domain_modgroup" role="form" method="post" enctype="multipart/form-data">
+                        <div class="form-group col-sm-12 hide">
+                            <div class="col-sm-2">  <h5 style="float:right;">ID<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-9">
+                                <input class="form-control" type="text" name="group_id">
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-2">  <h5 style="float:right;">组名<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-9">
+                                <input class="form-control" type="text" name="group_name">
+                            </div>
+                        </div>
+
+                        <hr width="100%" />
+                        <div class="col-sm-12">
+                            <div class="col-sm-5"> </div>
+                            <button type="submit" class="btn btn-primary js_confirm">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade in" style="display: none"></div>
+
+
+    <script src="/static/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/static/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/static/js/plugins/jeditable/jquery.jeditable.js"></script>
+{#    <script src="/static/js/plugins/dataTables/jquery.dataTables.js"></script>#}
+{#    <script src="/static/js/plugins/dataTables/dataTables.bootstrap.js"></script>#}
+
+{#    <script src="/static/js/plugins/sweetalert/sweetalert.min.js"></script>#}
+{#    <script src="/static/js/plugins/layer/layer.min.js"></script>#}
+    <script src="/static/js/plugins/footable/footable.all.min.js"></script>
+    <script src="/static/js/content.min.js?v=1.0.0"></script>
+    <script>
+        $(document).ready(function() {
+
+            $('.footable').footable();
+            $('.footable2').footable();
+
+        });
+
+    </script>
+
+    <script>
+        {% if result %}
+        swal("{{ result }}");
+        {% endif %}
+
+        </script>
+
+    <script>
+        $(document).ready(function(){$(".dataTables-example").dataTable( {
+              //跟数组下标一样，第一列从0开始，这里表格初始化时，第四列默认降序
+                "order": [[ 1, "desc" ]]
+              });var oTable=$("#editable").dataTable();oTable.$("td").editable("http://www.zi-han.net/theme/example_ajax.php",{"callback":function(sValue,y){var aPos=oTable.fnGetPosition(this);oTable.fnUpdate(sValue,aPos[0],aPos[1])},"submitdata":function(value,settings){return{"row_id":this.parentNode.getAttribute("id"),"column":oTable.fnGetPosition(this)[2]}},"width":"90%","height":"100%"})});function fnClickAddRow(){$("#editable").dataTable().fnAddData(["Custom row","New row","New row","New row","New row"])};
+    </script>
+
+    <script>
+        function refresh(){
+            window.location.reload();
+        }
+    </script>
+{#    <script>#}
+{#           $(".detail").click(function(){#}
+{#               var id = $(this).val();#}
+{#               var url = 'http://ops.gmfcloud.com/soft_detail?id='+id;#}
+{#                layer.open({#}
+{#                  type: 2,#}
+{#                  title: '详情页',#}
+{#                  shadeClose: true,#}
+{#                  shade: false,#}
+{#                  maxmin: true, //开启最大化最小化按钮#}
+{#                  area: ['450px', '450px'],#}
+{#                  content: url#}
+{#                });#}
+{#             });#}
+{#    </script>#}
+<script>
+    $(' .del_confirm').click(function(){
+        return confirm("确认要执行删除操作吗？");
+    });
+    $(' .js_confirm').click(function(){
+        return confirm("确认执行操作吗？");
+    });
+</script>
+
+    <script>
+        $(' .domain_confirm').click(function(){
+            return confirm("确认要对" + $(this).attr("id") + "执行删除或停止操作吗？");
+        });
+    </script>
+    <script>
+        // 域名分组管理菜单操作
+        $(".l-g-menu").mouseover(function () {
+           $(this).children('a').slice(1,3).removeClass("hide")
+        });
+        $(".l-g-menu").mouseout(function () {
+           $(this).children('a').slice(1,3).addClass("hide")
+        });
+
+        $('#create-group-button').click(function (){
+            $('#create-group-modal').addClass('in');
+            $('#create-group-modal').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+        });
+
+        $('.close-create-group').click(function () {
+		    $("#create-group-modal").css('display','none');
+		    $("#create-group-modal").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+        });
+
+        $(".dropdown-menu").on("click",".mod-group-button",function () {
+            var group_name = $(this).siblings('.get-gname').text().trim();
+            var group_id = $(this).attr("g_id");
+            console.log(group_id);
+            $('#mod-group-modal').addClass('in');
+            $('#mod-group-modal').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+            $("#mod-group-modal").find("input").val("");
+		    $("#mod-group-modal").find("input").eq(0).val(group_id);
+		    $("#mod-group-modal").find("input").eq(1).val(group_name);
+        });
+
+        $('.close-mod-group').click(function () {
+		    $("#mod-group-modal").css('display','none');
+		    $("#mod-group-modal").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+        });
+
+    </script>
+
+    <script>
+        // 创建dnspod域名
+        $('.create-domain-button').click(function (){
+            $('#create-domain').addClass('in');
+            $('#create-domain').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+			//$(".get_group").empty();
+			/*
+			$.ajax({
+                url:"/dnspod/add_domain",
+                type:"GET",
+                dataType:'JSON',
+                success:function (arg){
+                    //console.log(arg);
+                    if(arg){
+                        $.each(arg,function (k,v) {
+                            $(".get_group").append(
+                                "<option value=" +v['group_id'] + ">"+v['group_name'] +"</option>"
+                            )
+                        })
+                    }else{
+
+                    }
+                }
+            })
+            */
+        });
+
+        $('.close_domain_modal').click(function () {
+		    $("#create-domain").css('display','none');
+		    $("#create-domain").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+
+        });
+
+
+    </script>
+
+    <script>
+        //查看域名日志
+        $("table").on('click','.get-log',function () {
+            $('#log-modal').addClass('in');
+            $('#log-modal').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+            var did = $(this).attr('did');
+			$("#domain-log").empty();
+			$.ajax({
+                url:"/dnspod/domain_log",
+                type:"GET",
+                data:{domain_id:did},
+                dataType:'JSON',
+                success:function (arg){
+                    //console.log(arg);
+                    if(arg){
+                        $("#domain-log").text(arg);
+                    }else{
+                        $("#domain-log").text("获取失败！");
+                    }
+                }
+            })
+        });
+
+        $('.close_log_modal').click(function () {
+		    $("#log-modal").css('display','none');
+		    $("#log-modal").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+
+        });
+    </script>
+
+    <script>
+        //添加域名备注
+        $("table").on('click','.add_remark',function () {
+            $('#mod-remark').addClass('in');
+            $('#mod-remark').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+
+            $('#mod-remark textarea').val($(this).attr('remark'));
+            $('#mod-remark input').val($(this).attr('did'));
+        });
+
+        $('.close_remark_modal').click(function () {
+		    $("#mod-remark").css('display','none');
+		    $("#mod-remark").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+        });
+    </script>
+
+    <script>
+        //修改域名的分组
+        $("table").on("click",".change-group",function () {
+
+            $(".change-group").siblings("form").remove();
+            $(".change-group").show();
+            //$(this).siblings($("form")).remove();
+            var group_id = $(this).text();
+            var domain_id = $(this).parents("td").siblings().eq(0).text();
+            $(this).hide();
+            var form = $("<form></form>");
+            //form.attr("action","/dnspod/domain_changegroup");
+            //form.attr("method","post");
+            form.attr("id","domain_group_id");
+            form.css("display","inline-block");
+            var select = $("<select></select>");
+            //select.empty();
+            select.attr("name","group_id");
+            select.attr("id","change_group_id");
+            var groups = {{ groups | tojson }};
+            $.each(groups,function (k,v) {
+                if(v['group_id'] == group_id){
+                    select.append(
+                        "<option selected='selected' value=" +v['group_id'] + ">"+v['group_name'] +"</option>"
+                    )
+                }else{
+                    select.append(
+                        "<option value=" +v['group_id'] + ">"+v['group_name'] +"</option>"
+                    )
+                }
+            });
+            form.append("<input style='display:none;' type='text' name='domain_id' value=" + domain_id + ">");
+            form.append(select);
+            $(this).parent().append(form);
+        })
+
+    </script>
+
+    <script>
+        //修改域名的分组
+        $("table").on("change","#change_group_id",function () {
+            //$("#domain_group_id").submit();
+            var gid = $(this).parent().siblings("a");
+            var group_id = $(this).val();
+            var domain_id = $(this).prev().val();
+            $.ajax({
+                url:"/dnspod/domain_changegroup",
+                type:"POST",
+                data:{group_id:group_id,domain_id:domain_id},
+                dataType:'JSON',
+                success:function (arg) {
+                    if(arg){
+                        gid.text(group_id);
+                        gid.show();
+                        $("#domain_group_id").remove();
+                    }
+                    else{
+
+                    }
+                }
+            })
+        })
+    </script>
+    <script>
+        // 如果通知元素存在,则3秒后淡出
+            if ($(".alert")){
+                $(".alert").fadeOut(3000);
+            }
+    </script>
+
+
+
+</body>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_data_tables.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:02 GMT -->
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_data_tables.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:01 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>H+ 后台主题UI框架 - 数据表格</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="../static/favicon.ico">
+    <link href="/static/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+
+    <!-- Data Tables -->
+{#    <link href="/static/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">#}
+    <link href="/static/css/plugins/footable/footable.core.css" rel="stylesheet">
+    <link href="/static/css/animate.min.css" rel="stylesheet">
+    <link href="/static/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/css/gstyle.css" rel="stylesheet">
+</head>
+
+<body class="gray-bg">
+    <!--通知消息处-->
+    {% if result  %}
+        {% if result["code"] == 0 %}
+            <div class="alert alert-success" style="text-align: center">执行成功:<strong>{{ result["message"] }}</strong></div>
+        {% else %}
+            <div class="alert alert-danger" style="text-align: center">执行失败:<strong>{{ result["message"] }}</strong></div>
+        {% endif %}
+    {% endif %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                            <ol class="breadcrumb">
+                                  <li><a href="/index_v3"><span class="g_nav_font">星云平台</span></a></li>
+                                  <li><a href="/dnspod"><span class="g_nav_font">DNS管理</span></a></li>
+                                  <li class="active">{{ domain_info.name }}记录列表</li>
+                                <div class="ibox-tools">
+                                    <a onclick="refresh()">
+                                        <i class="fa fa-refresh"></i>
+                                    </a>
+                                </div>
+                            </ol>
+                        </div>
+                    <div class="ibox-content">
+
+                        <div class="col-sm-8 m-b-xs">
+    {#                                 {% if admin_button %}#}
+                             <a class="btn btn-info create-record-button">+ 添加记录</a>
+    {#                                 {% endif %}#}
+                        </div>
+                        <div class="col-sm-4 m-b-xs">
+                            <input type="text" class="form-control input-sm m-b-xs" id="filter"
+                               placeholder="搜索记录...">
+                        </div>
+
+                        <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="20" data-filter=#filter>
+                            <thead>
+                                <tr>
+                                    <th>记录ID编号</th>
+                                    <th>主机记录</th>
+                                    <th>记录类型</th>
+                                    <th>线路类型</th>
+                                    <th>记录值</th>
+                                    <th>权重</th>
+                                    <th>MX优先级</th>
+                                    <th>TTL值</th>
+
+                                    <th data-hide="all">记录状态</th>
+                                    <th data-hide="all">系统内部标识状态</th>
+                                    <th data-hide="all">D监控状态</th>
+                                    <th data-hide="all">记录备注</th>
+                                    <th data-hide="all">最后更新时间</th>
+                                    <th data-hide="all">是否开通网站安全中心</th>
+
+                                    <th>操作(状态/备注/修改/删除)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for r in record_list %}
+                                    <tr>
+                                        <td>{{ r.id }}</td>
+                                        <td>{{ r.name }}</td>
+                                        <td>{{ r.type }}</td>
+                                        <td>{{ r.line_id }}/{{ r.line }}</td>
+                                        <td>{{ r.value }}</td>
+                                        <td>{{ r.weight }}</td>
+                                        <td>{{ r.mx }}</td>
+                                        <td>{{ r.ttl }}</td>
+
+                                        <td>
+                                            {% if r.enabled == "0" %}
+                                                <font color="red">禁用</font>
+                                            {% else %}
+                                                <font color="green">启用</font>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ r.status }}</td>
+                                        <td>{{ r.monitor_status }}</td>
+                                        <td>{{ r.remark }}</td>
+                                        <td>{{ r.updated_on }}</td>
+                                        <td>{{ r.use_aqb }}</td>
+
+                                        <td style="text-align: center;font-size: 20px">
+{#                                            {% if admin_button %}#}
+{#                                            {% endif %}#}
+                                            {% if r.enabled == "0" %}
+                                                <a class="js_confirm" title="启用"
+                                                   href="/dnspod_record/record_status?domain_id={{ domain_info.id }}&record_id={{ r.id }}&status=enabled">
+                                                    <i class="fa fa-play"></i>
+                                                </a>
+                                            {% else %}
+                                                <a class="js_confirm" title="禁用" style="color: orange"
+                                                   href="/dnspod_record/record_status?domain_id={{ domain_info.id }}&record_id={{ r.id }}&status=disable">
+                                                    <i class="fa fa-pause"></i>
+                                                </a>
+                                            {% endif %}
+
+                                            {% if r.remark %}
+                                                <a class="add_remark" rid={{ r.id }} remark={{ r.remark }} title={{ r.remark }}>
+                                                    <i class="fa fa-file-text"></i>
+                                                </a>
+                                            {% else %}
+                                                <a class="add_remark" rid={{ r.id }} remark="" title="点击添加备注" style="color: #adaeaf">
+                                                    <i class="fa fa-file-text"></i>
+                                                </a>
+                                            {% endif %}
+
+                                            <a class="mod-record-btn" title="修改记录" rid="{{ r.id }}" did="{{ domain_info.id }}">
+                                                <i class="fa fa-cog"></i>
+                                            </a>
+                                            <a href="/dnspod_record/del_record?domain_id={{ domain_info.id }}&record_id={{ r.id }}" title="删除记录" class="del_confirm" style="margin-right: 15px"><i class="fa fa-trash"></i></a>
+
+                                        </td>
+                                    </tr>
+                                {%endfor%}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="9">
+                                            <ul class="pagination pull-right"></ul>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                        </table>
+
+                </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="create-record" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close_record_modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">添加记录</h4>
+                </div>
+                <div class="panel-body">
+                    <form action="/dnspod_record/add_record" role="form" method="post" enctype="multipart/form-data">
+
+                        <div class="form-group col-sm-12" style="display: none">
+                            <div class="col-sm-3">  <h5 style="float:right;">域名ID<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="domain_id" value="{{ domain_info.id }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">主机记录<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="sub_domain" placeholder="如 www，不填写默认为 @">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">记录类型<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <select name="record_type" id="get_type" class="form-control">
+                                    {% for t in types %}
+                                    <option value="{{ t }}">{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12" id="mx_input">
+                            <div class="col-sm-3">  <h5 style="float:right;">MX优先级<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="number" min="1" max="20" name="mx"
+                                       placeholder="记录类型是MX有效，范围1-20, MX记录必填">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">记录线路<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <select name="record_line"  class="form-control">
+                                    {% for l in lines %}
+                                    <option value="{{ l }}">{{ l }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">记录值<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="value" placeholder="如 CNAME: cname.dnspod.com.,必须填写">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">TTL值<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="number" min="600" max="604800" name="ttl"
+                                       placeholder="范围600-604800，不同等级域名最小值不同">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">记录初始状态<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <select name="status" class="form-control">
+                                    <option value="enable">启用</option>
+                                    <option value="disable">禁用</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">权重信息<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="number" min="1" max="100" name="weight"
+                                       placeholder="0~100，0表示关闭，留空或者不传该参数，表示不设置权重信息">
+                            </div>
+                        </div>
+
+                        <hr width="100%" />
+                        <div class="col-sm-12">
+                            <div class="col-sm-5"> </div>
+                            <button type="submit" class="btn btn-primary js_confirm">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mod-record" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close_mod_modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">修改记录</h4>
+                </div>
+                <div class="panel-body">
+                    <form action="/dnspod_record/mod_record" role="form" method="post" enctype="multipart/form-data">
+
+                        <div class="form-group col-sm-12" style="display: none">
+                            <div class="col-sm-3">  <h5 style="float:right;">域名ID<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="domain_id" value="{{ domain_info.id }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12" style="display: none">
+                            <div class="col-sm-3">  <h5 style="float:right;">记录ID<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="record_id">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">主机记录<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="sub_domain" placeholder="如 www，不填写默认为 @">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">记录类型<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <select name="record_type" id="get_mod_type" class="form-control">
+                                    {% for t in types %}
+                                    <option value="{{ t }}">{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12" id="mx_mod_input">
+                            <div class="col-sm-3">  <h5 style="float:right;">MX优先级<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="number" min="0" max="20" name="mx"
+                                       placeholder="记录类型是MX有效，范围1-20, MX记录必填">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">记录线路<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <select name="record_line" id="get_line" class="form-control">
+                                    {% for l in lines %}
+                                    <option value="{{ l }}">{{ l }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">记录值<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="value" placeholder="如 CNAME: cname.dnspod.com.,必须填写">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">TTL值<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="number" min="600" max="604800" name="ttl"
+                                       placeholder="600-604800，不同等级域名最小值不同">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">记录状态<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <select name="status" id="get_status" class="form-control">
+                                    <option value="enable" sid="1">启用</option>
+                                    <option value="disable" sid="0">禁用</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">权重信息<font style="color:red;"> </font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="number" min="1" max="100" name="weight"
+                                       placeholder="0~100，0表示关闭，留空或者不传该参数，表示不设置权重信息">
+                            </div>
+                        </div>
+
+                        <hr width="100%" />
+                        <div class="col-sm-12">
+                            <div class="col-sm-5"> </div>
+                            <button type="submit" class="btn btn-primary js_confirm">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mod-remark" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close_remark_modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">添加备注</h4>
+                </div>
+                <div class="panel-body">
+                    <form action="/dnspod_record/record_remark" role="form" method="post" enctype="multipart/form-data">
+
+                        <div class="form-group col-sm-12" style="display: none">
+                            <div class="col-sm-3">  <h5 style="float:right;">域名ID<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="domain_id" value="{{ domain_info.id }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12" style="display: none">
+                            <div class="col-sm-3">  <h5 style="float:right;">记录ID<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="record_id">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-12">
+                                <textarea class="form-control" type="text" name="remark" rows="5" placeholder="最大200字符，域名备注，删除备注请提交空内容">
+
+                                </textarea>
+                            </div>
+                        </div>
+
+                        <hr width="100%" />
+                        <div class="col-sm-12">
+                            <div class="col-sm-5"> </div>
+                            <button type="submit" class="btn btn-primary js_confirm">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade in" style="display: none"></div>
+
+
+    <script src="/static/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/static/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/static/js/plugins/jeditable/jquery.jeditable.js"></script>
+{#    <script src="/static/js/plugins/dataTables/jquery.dataTables.js"></script>#}
+{#    <script src="/static/js/plugins/dataTables/dataTables.bootstrap.js"></script>#}
+
+{#    <script src="/static/js/plugins/sweetalert/sweetalert.min.js"></script>#}
+{#    <script src="/static/js/plugins/layer/layer.min.js"></script>#}
+    <script src="/static/js/plugins/footable/footable.all.min.js"></script>
+    <script src="/static/js/content.min.js?v=1.0.0"></script>
+    <script>
+        $(document).ready(function() {
+
+            $('.footable').footable();
+            $('.footable2').footable();
+
+        });
+
+    </script>
+
+    <script>
+        {% if result %}
+        swal("{{ result }}");
+        {% endif %}
+
+        </script>
+
+    <script>
+        $(document).ready(function(){$(".dataTables-example").dataTable( {
+              //跟数组下标一样，第一列从0开始，这里表格初始化时，第四列默认降序
+                "order": [[ 1, "desc" ]]
+              });var oTable=$("#editable").dataTable();oTable.$("td").editable("http://www.zi-han.net/theme/example_ajax.php",{"callback":function(sValue,y){var aPos=oTable.fnGetPosition(this);oTable.fnUpdate(sValue,aPos[0],aPos[1])},"submitdata":function(value,settings){return{"row_id":this.parentNode.getAttribute("id"),"column":oTable.fnGetPosition(this)[2]}},"width":"90%","height":"100%"})});function fnClickAddRow(){$("#editable").dataTable().fnAddData(["Custom row","New row","New row","New row","New row"])};
+    </script>
+
+    <script>
+        function refresh(){
+            window.location.reload();
+        }
+    </script>
+
+    <script>
+        $(' .del_confirm').click(function(){
+            return confirm("确认要执行删除操作吗？");
+        });
+        $(' .js_confirm').click(function(){
+            return confirm("确认执行操作吗？");
+        });
+    </script>
+
+    <script>
+        $(' .domain_confirm').click(function(){
+            return confirm("确认要对" + $(this).attr("id") + "执行删除或停止操作吗？");
+        });
+    </script>
+
+    <script>
+        //创建记录按钮
+        $('.create-record-button').click(function (){
+            $('#create-record').addClass('in');
+            $('#create-record').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+			$("#get_group").empty();
+			$.ajax({
+                url:"",
+                type:"GET",
+                dataType:'JSON',
+                success:function (arg){
+                    console.log(arg);
+                    if(arg){
+                        $.each(arg,function (k,v) {
+                            $("#get_group").append(
+                                "<option value=" +v['group_id'] + ">"+v['group_name'] +"</option>"
+                            )
+                        })
+                    }else{
+
+                    }
+                }
+            })
+        });
+
+        $('.close_record_modal').click(function () {
+		    $("#create-record").css('display','none');
+		    $("#create-record").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+
+        });
+
+    </script>
+
+    <script>
+        //修改记录按钮
+        $("table").on('click','.mod-record-btn',function () {
+            $('#mod-record').addClass('in');
+            $('#mod-record').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+            rid = $(this).attr('rid');
+            did = $(this).attr('did');
+            $.ajax({
+                url:"/dnspod_record/mod_record",
+                type:"GET",
+                data:{record_id:rid,domain_id:did},
+                dataType:'JSON',
+                success:function (arg) {
+                    if(arg){
+                        console.log(arg);
+                        $("#mod-record input").val("");
+                        $("#mod-record option").attr("selected","");
+                        var $arg_list = [arg["domain_id"],arg["id"],arg["sub_domain"],
+                                         arg["mx"],arg["value"],arg["ttl"],arg["weight"] ];
+                        $("#mod-record input").each(function (k) {
+                            $(this).val($arg_list[k]);   //在前端页面上显示更改的数据
+                        });
+                        $("#get_mod_type").val(arg['record_type']);
+                        $("#get_line").val(arg['record_line']);
+                        if(arg['enabled'] == 1){$("#get_status").val("enable");}
+                        else{$("#get_status").val("disable");}
+                    }else{
+                        console.log('failed');
+                }
+                },
+                complete:function () {
+                    if($("#get_mod_type").val() == "MX"){
+                        $("#mx_mod_input").show();
+                    }else{
+                        // 默认不显示
+                        $("#mx_mod_input").hide();
+                    }
+                }
+            });
+        });
+
+        $('.close_mod_modal').click(function () {
+		    $("#mod-record").css('display','none');
+		    $("#mod-record").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+        });
+    </script>
+
+    <script>
+            if($("#get_type").val() == "MX"){
+                $("#mx_input").show();
+            }else{
+                // 默认不显示
+                $("#mx_input").hide();
+            }
+
+
+            // 选择改变时一起改变
+            $("#get_type").change(function(){
+                var type = $("#get_type").val();
+                if ( type == "MX") {
+                    //console.log('mx');
+                    $("#mx_input").show();
+                } else {
+                    //console.log('else');
+                    $("#mx_input").hide()
+                }
+            });
+
+            $("#get_mod_type").change(function(){
+                var mod_type = $("#get_mod_type").val();
+                if ( mod_type == "MX") {
+                    //console.log('mx');
+                    $("#mx_mod_input").show();
+                } else {
+                    //console.log('else');
+                    $("#mx_mod_input").hide()
+                }
+            })
+
+    </script>
+
+    <script>
+        $("table").on('click','.add_remark',function () {
+            $('#mod-remark').addClass('in');
+            $('#mod-remark').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+
+            $('#mod-remark textarea').val($(this).attr('remark'));
+            $('#mod-remark input').eq(1).val($(this).attr('rid'));
+        });
+
+        $('.close_remark_modal').click(function () {
+		    $("#mod-remark").css('display','none');
+		    $("#mod-remark").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+        });
+    </script>
+</body>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_data_tables.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:02 GMT -->
+</html>

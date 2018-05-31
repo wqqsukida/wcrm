@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_data_tables.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:01 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>H+ 后台主题UI框架 - 数据表格</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="../static/favicon.ico">
+    <link href="/static/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+
+    <!-- Data Tables -->
+{#    <link href="/static/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">#}
+    <link href="/static/css/plugins/footable/footable.core.css" rel="stylesheet">
+    <link href="/static/css/animate.min.css" rel="stylesheet">
+    <link href="/static/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/css/gstyle.css" rel="stylesheet">
+</head>
+
+<body class="gray-bg">
+    <!--通知消息处-->
+    {% if result  %}
+        {% if result["code"] == 0 %}
+            <div class="alert alert-success" style="text-align: center">执行成功:<strong>{{ result["message"] }}</strong></div>
+        {% else %}
+            <div class="alert alert-danger" style="text-align: center">执行失败:<strong>{{ result["message"] }}</strong></div>
+        {% endif %}
+    {% endif %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                            <ol class="breadcrumb">
+                                  <li><a href="/index_v3"><span class="g_nav_font">星云平台</span></a></li>
+                                  <li><a href="/dnspod"><span class="g_nav_font">DNS管理</span></a></li>
+                                  <li class="active">D监控</li>
+                                <div class="ibox-tools">
+                                    <a onclick="refresh()">
+                                        <i class="fa fa-refresh"></i>
+                                    </a>
+                                </div>
+                            </ol>
+                        </div>
+                    <div class="ibox-content">
+
+                        <div class="col-sm-8 m-b-xs">
+    {#                                 {% if admin_button %}#}
+                             <a class="btn btn-info create-monitor-button">+ 添加监控</a>
+                             <a class="btn btn-danger" id="get-log">报警日志</a>
+    {#                                 {% endif %}#}
+                        </div>
+                        <div class="col-sm-4 m-b-xs">
+                            <input type="text" class="form-control input-sm m-b-xs" id="filter"
+                               placeholder="搜索...">
+                        </div>
+
+                        <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="20" data-filter=#filter>
+                            <thead>
+                                <tr>
+                                    <th>监控ID</th>
+                                    <th>HOST</th>
+                                    <th>域名</th>
+                                    <th>子域名</th>
+                                    <th>状态</th>
+                                    <th>monitor_status</th>
+
+                                    <th data-hide="all">domain_grade</th>
+                                    <th data-hide="all">record_line</th>
+                                    <th data-hide="all">ip</th>
+                                    <th data-hide="all">now_ip</th>
+                                    <th data-hide="all">监控类型</th>
+                                    <th data-hide="all">监控路径</th>
+                                    <th data-hide="all">监控间隔</th>
+                                    <th data-hide="all">监控节点</th>
+                                    <th data-hide="all">created_on</th>
+                                    <th data-hide="all">updated_on</th>
+
+                                    <th>操作(状态/修改/删除)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for m in monitors %}
+                                    <tr>
+                                        <td>
+                                            {{ m.monitor_id }}
+                                        </td>
+                                        <td><a class="label" href="/dnspod_d/gethistory_monitor?monitor_id={{ m.monitor_id }}&hours=1"
+                                        title="查看监控历史">{{ m.host }}</a> PORT:{{ m.port }}</td>
+                                        <td title="域名ID:{{ m.domain_id }}">{{ m.domain }}</td>
+                                        <td title="记录ID:{{ m.record_id }}">{{ m.sub_domain }}</td>
+                                        <td>
+                                            {% if m.status == "Ok" %}
+                                                <span class="badge badge-primary">{{ m.status }}</span>
+                                            {% elif m.status == "Warn" %}
+                                                <span class="badge badge-warning">{{ m.status }}</span>
+                                            {% elif m.status == "Down" %}
+                                                <span class="badge badge-danger">{{ m.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ m.monitor_status }}
+                                        </td>
+
+                                        <td>{{ m.domain_grade }}</td>
+                                        <td>{{ m.record_line }}</td>
+                                        <td>{{ m.ip }}</td>
+                                        <td>{{ m.now_ip }}</td>
+                                        <td>{{ m.monitor_type }}</td>
+                                        <td>{{ m.monitor_path }}</td>
+                                        <td>{{ m.monitor_interval }}</td>
+                                        <td>{{ m.points }}</td>
+                                        <td>{{ m.created_on }}</td>
+                                        <td>{{ m.updated_on }}</td>
+
+                                        <td style="text-align: center;font-size: 20px">
+{#                                            {% if admin_button %}#}
+{#                                            {% endif %}#}
+                                            {% if m.monitor_status == "disabled" %}
+                                                <a class="js_confirm" title="启用"
+                                                   href="/dnspod_d/setstatus_monitor?monitor_id={{ m.monitor_id }}&status=enabled">
+                                                    <i class="fa fa-play"></i>
+                                                </a>
+                                            {% else %}
+                                                <a class="js_confirm" title="禁用" style="color: orange"
+                                                   href="/dnspod_d/setstatus_monitor?monitor_id={{ m.monitor_id }}&status=disabled">
+                                                    <i class="fa fa-pause"></i>
+                                                </a>
+                                            {% endif %}
+                                            <a class="mod-monitor-btn" title="修改监控记录" mid="{{ m.monitor_id }}">
+                                                <i class="fa fa-cog"></i>
+                                            </a>
+                                            <a href="/dnspod_d/remove_monitor?monitor_id={{ m.monitor_id }}" title="删除监控记录" class="del_confirm" style="margin-right: 15px"><i class="fa fa-trash"></i></a>
+
+                                        </td>
+                                    </tr>
+                                {%endfor%}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="9">
+                                            <ul class="pagination pull-right"></ul>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                        </table>
+
+                </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="create-monitor" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close_monitor_modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">添加监控</h4>
+                </div>
+                <div class="panel-body">
+                    <form action="/dnspod_d/create_monitor" role="form" method="post" enctype="multipart/form-data">
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">域名<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="domain_id" id="get_did">
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">子域名<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <select  class="form-control" name="record_id" id="get_rid">
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">监控间隔<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <select class="form-control"  name="monitor_interval">
+                                    <option value="180">180</option>
+                                    <option value="360">360</option>
+                                    <option value="600">600</option>
+                                </select>
+                            </div>
+                        </div>
+{#                        <div class="form-group col-sm-12">#}
+{#                            <div class="col-sm-3">  <h5 style="float:right;">记录类型<font style="color:red;"> </font></h5></div>#}
+{#                            <div class="col-sm-8">#}
+{#                                <select name="record_type" id="get_type" class="form-control">#}
+{#                                    {% for t in types %}#}
+{#                                    <option value="{{ t }}">{{ t }}</option>#}
+{#                                    {% endfor %}#}
+{#                                </select>#}
+{#                            </div>#}
+{#                        </div>#}
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">主机头<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text"  name="host" id="get_host"
+                                       placeholder="监控主机头，比如 www.dnspod.cn,必选">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">路 径<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text"  name="monitor_path" id="get_path"
+                                       placeholder="监控路径，比如/，必选">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">端 口<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="number" min="0" max="65535" name="port" id="get_port"
+                                       placeholder="监控端口，比如80，必选">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">监控类型<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <select class="form-control"  name="monitor_type">
+                                    <option value="http">http</option>
+                                    <option value="https">https</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">监控节点<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="points" id="get_points">
+                                    
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">宕机备用<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="bak_ip" id="get_bak_ip">
+                                    <option value="pass">pass</option>
+                                    <option value="pause">pause</option>
+                                    <option value="pause2">pause2</option>
+                                    <option value="auto">auto</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr width="100%" />
+                        <div class="col-sm-12">
+                            <div class="col-sm-5"> </div>
+                            <button type="submit" class="btn btn-primary js_confirm">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mod-monitor" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close_mod_modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">修改监控设置</h4>
+                </div>
+                <div class="panel-body">
+                    <form action="/dnspod_d/modify_monitor" role="form" method="post" enctype="multipart/form-data">
+                        <div class="tabs-container">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true">基本设置</a>
+                                </li>
+                                <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">通知设置</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div id="tab-1" class="tab-pane active">
+                                    <div class="panel-body">
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-3">  <h5 style="float:right;">监控ID<font style="color:red;"> *</font></h5></div>
+                                            <div class="col-sm-8">
+                                                <input class="form-control"  name="monitor_id" id="mod_id">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-3">  <h5 style="float:right;">主机头<font style="color:red;"> *</font></h5></div>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" type="text"  name="host" id="mod_host"
+                                                       placeholder="监控主机头，比如 www.dnspod.cn,必选">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-3">  <h5 style="float:right;">路 径<font style="color:red;"> *</font></h5></div>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" type="text"  name="monitor_path" id="mod_path"
+                                                       placeholder="监控路径，比如/，必选">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-3">  <h5 style="float:right;">端 口<font style="color:red;"> *</font></h5></div>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" type="number" min="0" max="65535" name="port" id="mod_port"
+                                                       placeholder="监控端口，比如80，必选">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-3">  <h5 style="float:right;">监控间隔<font style="color:red;"> *</font></h5></div>
+                                            <div class="col-sm-8">
+                                                <select class="form-control"  name="monitor_interval" id="mod_interval">
+                                                    <option value="180">180</option>
+                                                    <option value="360">360</option>
+                                                    <option value="600">600</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-3">  <h5 style="float:right;">监控类型<font style="color:red;"> *</font></h5></div>
+                                            <div class="col-sm-8">
+                                                <select class="form-control"  name="monitor_type" id="mod_type">
+                                                    <option value="http">http</option>
+                                                    <option value="https">https</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-3">  <h5 style="float:right;">监控节点<font style="color:red;"> *</font></h5></div>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" name="points" id="mod_points" multiple="multiple" size="2">
+{#                                                    <option value="ctc">ctc</option>#}
+{#                                                    <option value="cuc">cuc</option>#}
+{#                                                    <option value="cmc">cmc</option>#}
+                                                    <option value="random">随机</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-3">  <h5 style="float:right;">宕机备用<font style="color:red;"> *</font></h5></div>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" name="bak_ip" id="mod_bak_ip">
+                                                    <option value="pass">pass</option>
+                                                    <option value="pause">pause</option>
+                                                    <option value="pause2">pause2</option>
+                                                    <option value="auto">auto</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="tab-2" class="tab-pane">
+                                    <div class="panel-body">
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-2">  <h5 style="float:right;">TTL设置<font style="color:red;"> </font></h5></div>
+                                            <div class="col-sm-10">
+                                                <label class="">
+                                                    <input type="checkbox"  id="mod_keep_ttl"
+                                                    > 宕机切换后是否修改ttl
+                                                    <input type="hidden" name="keep_ttl"  id="hide_keep_ttl">
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-2">  <h5 style="float:right;">短信通知<font style="color:red;"> </font></h5></div>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text" name="sms_notice"
+                                                id="mod_sms_notice" placeholder="用,分隔多选，比如me,share">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-2">  <h5 style="float:right;">邮件通知<font style="color:red;"> </font></h5></div>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text" name="email_notice"
+                                                id="mod_email_notice" placeholder="用,分隔多选，比如me,share">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-2">  <h5 style="float:right;">通知策略<font style="color:red;"> </font></h5></div>
+                                            <div class="col-sm-10">
+                                                <label class="">
+                                                    <input type="checkbox"   id="mod_less_notice"
+                                                    > 是否一个小时内只发一次通知
+                                                    <input type="hidden" name="less_notice" id="hide_less_notice">
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-2">  <h5 style="float:right;">回调URL<font style="color:red;"> </font></h5></div>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text" name="callback_url"
+                                                id="mod_callback_url" placeholder="宕机后会将相关的参数提交到此设置的URL">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-2">  <h5 style="float:right;">回调密钥<font style="color:red;"> </font></h5></div>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text" name="callback_key"
+                                                id="mod_callback_key" placeholder="如果设置了回调URL请设置此参数以保证安全">
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" style="padding-top: 15px;">
+                            <div class="col-sm-5"> </div>
+                            <button type="submit" class="btn btn-primary js_confirm">提交修改</button>
+                        </div>
+                    </form>
+                    <!--
+                    <form action="" role="form" method="post" enctype="multipart/form-data">
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">监控ID<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control"  name="monitor_id" id="mod_id">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">监控间隔<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <select class="form-control"  name="monitor_interval" id="mod_interval">
+                                    <option value="180">180</option>
+                                    <option value="360">360</option>
+                                    <option value="600">600</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">主机头<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text"  name="host" id="mod_host"
+                                       placeholder="监控主机头，比如 www.dnspod.cn,必选">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">路 径<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text"  name="monitor_path" id="mod_path"
+                                       placeholder="监控路径，比如/，必选">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">端 口<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="number" min="0" max="65535" name="port" id="mod_port"
+                                       placeholder="监控端口，比如80，必选">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">监控类型<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <select class="form-control"  name="monitor_type" id="mod_type">
+                                    <option value="http">http</option>
+                                    <option value="https">https</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">监控节点<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="points" id="mod_points">
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-3">  <h5 style="float:right;">宕机备用<font style="color:red;"> *</font></h5></div>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="bak_ip" id="mod_bak_ip">
+                                    <option value="pass">pass</option>
+                                    <option value="pause">pause</option>
+                                    <option value="pause2">pause2</option>
+                                    <option value="auto">auto</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr width="100%" />
+                        <div class="col-sm-12">
+                            <div class="col-sm-5"> </div>
+                            <button type="submit" class="btn btn-primary js_confirm">提交</button>
+                        </div>
+                    </form>  -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="log-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 800px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close_log_modal" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">告警日志</h4>
+                </div>
+                <div class="panel-body">
+                    <pre id="getdowns-log" style="overflow: auto; height: 380px; line-height: 20px;">
+
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade in" style="display: none"></div>
+
+
+    <script src="/static/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/static/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/static/js/plugins/jeditable/jquery.jeditable.js"></script>
+{#    <script src="/static/js/plugins/dataTables/jquery.dataTables.js"></script>#}
+{#    <script src="/static/js/plugins/dataTables/dataTables.bootstrap.js"></script>#}
+
+{#    <script src="/static/js/plugins/sweetalert/sweetalert.min.js"></script>#}
+{#    <script src="/static/js/plugins/layer/layer.min.js"></script>#}
+    <script src="/static/js/plugins/footable/footable.all.min.js"></script>
+    <script src="/static/js/content.min.js?v=1.0.0"></script>
+    <script src="/static/js/plugins/loading/loading.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            $('.footable').footable();
+            $('.footable2').footable();
+
+        });
+
+    </script>
+    <!-- iCheck -->
+    <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                radioClass: 'iradio_square-green'
+            });
+        });
+    </script>
+
+    <script>
+        $('.check-one').click(function() {
+            console.log(123);
+            this.value = (this.value == "no") ? "yes" : "no";
+            alert(this.value);
+        });
+    </script>
+
+    <script>
+        {% if result %}
+        swal("{{ result }}");
+        {% endif %}
+
+        </script>
+
+    <script>
+        $(document).ready(function(){$(".dataTables-example").dataTable( {
+              //跟数组下标一样，第一列从0开始，这里表格初始化时，第四列默认降序
+                "order": [[ 1, "desc" ]]
+              });var oTable=$("#editable").dataTable();oTable.$("td").editable("http://www.zi-han.net/theme/example_ajax.php",{"callback":function(sValue,y){var aPos=oTable.fnGetPosition(this);oTable.fnUpdate(sValue,aPos[0],aPos[1])},"submitdata":function(value,settings){return{"row_id":this.parentNode.getAttribute("id"),"column":oTable.fnGetPosition(this)[2]}},"width":"90%","height":"100%"})});function fnClickAddRow(){$("#editable").dataTable().fnAddData(["Custom row","New row","New row","New row","New row"])};
+    </script>
+
+    <script>
+        function refresh(){
+            window.location.reload();
+        }
+    </script>
+
+    <script>
+        $(' .del_confirm').click(function(){
+            return confirm("确认要执行删除操作吗？");
+        });
+        $(' .js_confirm').click(function(){
+            return confirm("确认执行操作吗？");
+        });
+    </script>
+
+    <script>
+        $(' .domain_confirm').click(function(){
+            return confirm("确认要对" + $(this).attr("id") + "执行删除或停止操作吗？");
+        });
+    </script>
+
+    <script>
+        $("#mod_keep_ttl").click(function () {
+            if($(this).prop("checked")){$("#hide_keep_ttl").val("yes")}
+            else{$("#hide_keep_ttl").val("no")}
+        });
+        $("#mod_less_notice").click(function () {
+            if($(this).prop("checked")){$("#hide_less_notice").val("yes")}
+            else{$("#hide_less_notice").val("no")}
+        });
+    </script>
+
+    <script>
+        //创建监控记录按钮
+        $('.create-monitor-button').click(function (){
+            $('#create-monitor').addClass('in');
+            $('#create-monitor').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+			$("#get_rid").empty();
+			$("#get_did").empty();
+            $("#get_points").empty();
+            $("#get_port").val("");
+            $("#get_path").val("");
+            $("#get_host").val("");
+			$.bootstrapLoading.start({ loadingTips: "正在获取域名，请稍候..." });
+			$.ajax({
+                url:"/dnspod_d/list_subdomain",
+                type:"GET",
+                dataType:'JSON',
+                success:function (arg){
+                    console.log(arg);
+                    if(arg){
+                        $("#get_did").append(
+                            "<option disabled selected='selected'>====选择获取子域名====</option>"
+                        );
+                        $.each(arg,function (k,v) {
+                            //console.log(k);
+                            //console.log(v['id']);
+                            $("#get_did").append(
+                                "<option value=" + v['id'] + " rnames=" + v['rnames'] + ">"+ k +"</option>"
+                            )
+                        });
+                    }else{
+
+                    }
+                },
+                complete:function () {
+                    $.bootstrapLoading.end();
+                }
+            })
+        });
+
+        $('.close_monitor_modal').click(function () {
+		    $("#create-monitor").css('display','none');
+		    $("#create-monitor").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+
+        });
+
+        $('#get_did').on('change',function () {
+            var did = $(this).val();
+            var rnames = $(this).find("[value="+did+"]").attr('rnames');
+            $("#get_rid").empty();
+            $("#get_points").empty();
+            $("#get_port").val("");
+            $("#get_path").val("");
+            $("#get_host").val("");
+            $.bootstrapLoading.start({ loadingTips: "正在获取子域名，请稍候..." });
+            $.ajax({
+                url:"/dnspod_d/list_subvalue",
+                type:"GET",
+                data:{domain_id:did},
+                dataType:'JSON',
+                success:function (arg){
+                    if(arg){
+                        $("#get_rid").append(
+                            "<option disabled selected='selected'>====选择子域名自动填写====</option>"
+                        );
+                        $.each(arg,function (k,v) {
+                            //console.log(k);
+                            //console.log(v);
+                            if(v['record_name'] == '@'){
+                                $("#get_rid").append(
+                                    "<option value=" + v['id'] + ">"+ v['domain_name'] +"</option>"
+                                )
+                            }
+                            else{
+                                $("#get_rid").append(
+                                    "<option value=" + v['id'] + ">"+ v['record_name'] + '.' + v['domain_name'] +"</option>"
+                                )
+                            }
+                        });
+                        
+                    }else{
+
+                    }
+                },
+                complete:function () {
+                    $.bootstrapLoading.end();
+                }
+            })
+        });
+
+        $('#get_rid').bind('change',function () {
+            var did = $("#get_did").val();
+            var rid = $(this).val();
+            $("#get_points").empty();
+            $("#get_port").val("");
+            $("#get_path").val("");
+            $("#get_host").val("");
+            $.ajax({
+                url:"/dnspod_d/list_subvalue",
+                type:"POST",
+                data:{domain_id:did,record_id:rid},
+                dataType:'JSON',
+                success:function (arg){
+                    if(arg){
+                        $.each(arg['points'],function (k,v) {
+                            //console.log(k);
+                            //console.log(v);
+                            $("#get_points").append(
+                                "<option value=" + k + ">"+ v +"</option>"
+                            );
+                        });
+                        if(arg["record_name"] == '@'){
+                            $("#get_host").val(arg["domain_name"]);
+                        }
+                        else{
+                            $("#get_host").val(arg["record_name"] + '.' + arg["domain_name"]);
+                        }
+                        $("#get_port").val("80");
+                        $("#get_path").val("/");
+                    }else{
+
+                    }
+                },
+                complete:function () {
+                    $.bootstrapLoading.end();
+                }
+            })
+            
+        })
+    </script>
+
+    <script>
+        //修改监控记录按钮
+        $("table").on('click','.mod-monitor-btn',function () {
+            $('#mod-monitor').addClass('in');
+            $('#mod-monitor').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+            mid = $(this).attr('mid');
+            $("#mod_id").val("");
+            $("#mod_host").val("");
+            $("#mod_path").val("");
+            $("#mod_port").val("");
+            $("#mod_interval").val("");
+            $("#mod_type").val("");
+            $("#mod_points").val("");
+            $("#mod_bak_ip").val("");
+
+            $("#mod_keep_ttl").prop("checked",false);
+            $("#hide_keep_ttl").val("");
+            $("#mod_sms_notice").val("");
+            $("#mod_email_notice").val("");
+            $("#mod_less_notice").prop("checked",false);
+            $("#hide_less_notice").val("");
+            $("#mod_callback_url").val("");
+            $("#mod_callback_key").val("");
+            $.ajax({
+                url:"/dnspod_d/monitor_info",
+                type:"GET",
+                data:{monitor_id:mid},
+                dataType:'JSON',
+                success:function (arg) {
+                    //console.log(arg);
+                    if(arg){
+                        $("#mod_id").val(arg.monitor_id);
+                        $("#mod_host").val(arg.host);
+                        $("#mod_path").val(arg.monitor_path);
+                        $("#mod_port").val(arg.port);
+                        $("#mod_interval").val(arg.monitor_interval);
+                        $("#mod_type").val(arg.monitor_type);
+                        $("#mod_points").val(arg.points);
+                        $("#mod_bak_ip").val(arg.bak_ip);
+                        //if(arg.keep_ttl == "yes"){$("#mod_keep_ttl").prop("checked",true)}
+                        //else{$("#mod_keep_ttl ").prop("checked",false);}
+                        $("#mod_keep_ttl ").prop("checked",false);
+                        $("#hide_keep_ttl ").val("no");
+
+                        if(arg.less_notice == "yes"){$("#mod_less_notice").prop("checked",true)}
+                        else{$("#mod_less_notice").prop("checked",false);}
+                        $("#hide_less_notice").val(arg.less_notice);
+                        $("#mod_sms_notice").val(arg.sms_notice);
+                        $("#mod_email_notice").val(arg.email_notice);
+                        $("#mod_callback_url").val(arg.callback_url);
+                        $("#mod_callback_key").val(arg.callback_key);
+                    }else{
+                        console.log(arg);
+                }
+                },
+                complete:function () {
+                }
+            });
+        });
+
+        $('.close_mod_modal').click(function () {
+		    $("#mod-monitor").css('display','none');
+		    $("#mod-monitor").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+        });
+    </script>
+
+    <script>
+        //查看告警日志
+        $("body").on('click','#get-log',function () {
+            $('#log-modal').addClass('in');
+            $('#log-modal').css({display:'block',overflow:'auto'});
+			$('.modal-backdrop').css('display','block');
+			$("#getdowns-log").empty();
+			$.ajax({
+                url:"/dnspod_d/getdowns_monitor",
+                type:"GET",
+                dataType:'JSON',
+                success:function (arg){
+                    if(arg.monitor_downs){
+                        $.each(arg.monitor_downs,function (k,v) {
+                            $("#getdowns-log").append(
+                                k + " " + v.created_on +" " + v.host + " " + v.ip + " " + v.warn_reason + "\n"
+                            )
+                        });
+                    }else{
+                        $("#getdowns-log").text(arg);
+                    }
+                }
+            })
+        });
+
+        $('.close_log_modal').click(function () {
+		    $("#log-modal").css('display','none');
+		    $("#log-modal").removeClass('in');
+		    $('.modal-backdrop').css('display','none');
+
+        });
+    </script>
+
+    <script>
+        // 如果通知元素存在,则5秒后淡出
+            if ($(".alert")){
+                $(".alert").fadeOut(5000);
+            }
+    </script>
+</body>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_data_tables.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:02 GMT -->
+</html>

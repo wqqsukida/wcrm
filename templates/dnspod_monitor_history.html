@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_data_tables.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:01 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>H+ 后台主题UI框架 - 数据表格</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="../static/favicon.ico"> <link href="/static/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+
+    <!-- Data Tables -->
+    <link href="/static/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+
+    <link href="/static/css/animate.min.css" rel="stylesheet">
+    <link href="/static/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+    <link href="/static/css/gstyle.css" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg">
+    <!--通知消息处-->
+    {% if result  %}
+        {% if result["code"] == 0 %}
+            <div class="alert alert-success" style="text-align: center">执行成功:<strong>{{ result["message"] }}</strong></div>
+        {% else %}
+            <div class="alert alert-danger" style="text-align: center">执行失败:<strong>{{ result["message"] }}</strong></div>
+        {% endif %}
+    {% endif %}
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+
+                    <div class="ibox-title">
+                            <ol class="breadcrumb">
+                                  <li><a href="/index_v3"><span class="g_nav_font">星云平台</span></a></li>
+                                <li><a href="/dnspod"><span class="g_nav_font">DNS管理</span></a></li>
+                                <li><a href="/dnspod_d"><span class="g_nav_font">D监控</span></a></li>
+                                <li class="active">监控历史</li>
+                                <div class="ibox-tools">
+
+                                    <a onclick="refresh()">
+                                        <i class="fa fa-refresh"></i>
+                                    </a>
+                                </div>
+                            </ol>
+                    </div>
+                {% if dashs %}
+                    <div class="ibox-content">
+                        <div class="text-navy" style="text-align: center; margin-bottom: 30px;"><h2>{{ record_name }}<b>情况报表</b></h2></div>
+                        <div class="row">
+                            <div class="btn-group pull-right">
+                                <a href="/dnspod_d/gethistory_monitor?monitor_id={{ monitor_id  }}&hours=1" class="btn btn-white {% if hours == "1" %} active {% endif %}" type="button">1小时</a>
+                                <a href="/dnspod_d/gethistory_monitor?monitor_id={{ monitor_id  }}&hours=3" class="btn btn-white {% if hours == "3" %} active {% endif %}" type="button">3小时</a>
+                                <a href="/dnspod_d/gethistory_monitor?monitor_id={{ monitor_id  }}&hours=6" class="btn btn-white {% if hours == "6" %} active {% endif %}" type="button">6小时</a>
+                                <a href="/dnspod_d/gethistory_monitor?monitor_id={{ monitor_id  }}&hours=12" class="btn btn-white {% if hours == "12" %} active {% endif %}" type="button">12小时</a>
+                                <a href="/dnspod_d/gethistory_monitor?monitor_id={{ monitor_id  }}&hours=24" class="btn btn-white {% if hours == "24" %} active {% endif %}" type="button">24小时</a>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            {% for point in dashs %}
+
+                                <div class="col-sm-6">
+                                    <div class="ibox float-e-margins">
+                                        <div class="ibox-title">
+                                            <h5>{{ point.point }}</h5>
+                                        </div>
+                                        <div class="ibox-content">
+                                            <div id="{{ point.point }}" style="height: 300px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/static/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/static/js/plugins/jeditable/jquery.jeditable.js"></script>
+    <script src="/static/js/plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="/static/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+    <script src="/static/js/content.min.js?v=1.0.0"></script>
+    <script src="/static/js/plugins/sweetalert/sweetalert.min.js"></script>
+    <script src="/static/js/plugins/layer/layer.min.js"></script>
+    <!-- ECharts单文件引入 -->
+    <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+{#    <script>#}
+{#        $(document).ready(function(){$(".dataTables-example").dataTable();var oTable=$("#editable").dataTable();oTable.$("td").editable("http://www.zi-han.net/theme/example_ajax.php",{"callback":function(sValue,y){var aPos=oTable.fnGetPosition(this);oTable.fnUpdate(sValue,aPos[0],aPos[1])},"submitdata":function(value,settings){return{"row_id":this.parentNode.getAttribute("id"),"column":oTable.fnGetPosition(this)[2]}},"width":"90%","height":"100%"})});function fnClickAddRow(){$("#editable").dataTable().fnAddData(["Custom row","New row","New row","New row","New row"])};#}
+{#    </script>#}
+
+    <script>
+        function refresh(){
+            window.location.reload();
+        }
+    </script>
+
+    <script type="text/javascript">
+        var points = {{ dashs | tojson | safe }};
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/pie',
+                'echarts/chart/wordCloud',
+                'echarts/chart/line'
+            ],
+            function (ec) {
+                //var series =
+                $.each(points,function (k,point) {
+                    var chart = ec.init(document.getElementById(point.point));
+                    var x_data = [];
+                    var y_data = [];
+                    $.each(point.data.data,function (k,v) {
+                        x_data.push(v.createtime.split(" ")[1]);
+                        y_data.push(v.responsetime);
+                    });
+
+                    var chart_option = {
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data:[point.point]
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+
+                        data: x_data
+
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name:point.point,
+                            type:'line',
+                            stack: '',
+                            data:y_data
+                        }
+                    ]
+                };
+                    chart.setOption(chart_option);
+                });
+            }
+        );
+    </script>
+
+
+    <script>
+           $(".detail").click(function(){
+               var id = $(this).val();
+               var url = 'http://ops.gmfcloud.com/int_detail?id='+id;
+                layer.open({
+                  type: 2,
+                  title: '接口信息',
+                  shadeClose: true,
+                  shade: false,
+                  maxmin: true, //开启最大化最小化按钮
+                  area: ['600px', '300px'],
+                  content: url
+                });
+             });
+    </script>
+<script>
+    $(' .js_confirm').click(function(){
+        return confirm("确认要操作吗？");
+    });
+</script>
+    <script>
+        // 如果通知元素存在,则3秒后淡出
+            if ($(".alert")){
+                $(".alert").fadeOut(3000);
+            }
+    </script>
+</body>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_data_tables.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:02 GMT -->
+</html>
