@@ -341,9 +341,8 @@ def domain_changegroup(request):
     '''
     d_obj = Domain()
     result = {}
-    domain_id = request.GET.get("domain_id", "")
-    group_id = request.GET.get("group_id", "")
-    print(domain_id,group_id)
+    domain_id = request.POST.get("domain_id", "")
+    group_id = request.POST.get("group_id", "")
     status, data = d_obj.change_group(domain_id=domain_id, group_id=group_id)
 
     return HttpResponse(json.dumps(status))
