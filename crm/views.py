@@ -212,6 +212,196 @@ def add_domain(request):
     else:
         return HttpResponse(json.dumps(dict(code=1,message="please use get/post method!")))
 
+def del_domain(request):
+    '''
+    删除dnspod域名
+    :return:
+    '''
+    d_obj = Domain()
+    result = {}
+    if request.method == "GET":
+        domain_id = request.GET.get("domain_id", "")
+        status, data = d_obj.remove(domain_id=domain_id)
+        if status:
+            result = {"code": 0, "message": data['status']['message']}
+        else:
+            result = {"code": 1, "message": data}
+
+        return HttpResponseRedirect('/dnspod/?status={0}&message={1}'.
+                                    format(result.get("code", ""),
+                                           result.get("message", "")))
+    else:
+        return HttpResponse(json.dumps(dict(code=1, message="please use get method!")))
+
+def domain_status(request):
+    '''
+    修改域名状态
+    :return:
+    '''
+    d_obj = Domain()
+    result = {}
+    if request.method == "GET":
+        domain_id = request.GET.get("domain_id", "")
+        status = request.GET.get("status", "")
+        status_val, data = d_obj.status(domain_id=domain_id, status=status)
+        if status_val:
+            result = {"code": 0, "message": data['status']['message']}
+        else:
+            result = {"code": 1, "message": data}
+
+        return HttpResponseRedirect('/dnspod/?status={0}&message={1}'.
+                                    format(result.get("code", ""),
+                                           result.get("message", "")))
+    else:
+        return HttpResponse(json.dumps(dict(code=1, message="please use get method!")))
+
+def domain_log(request):
+    '''
+    获取域名操作日志：默认100条
+    :return:
+    '''
+    d_obj = Domain()
+
+    if request.method == "GET":
+        domain_id = request.GET.get("domain_id", "")
+        status, data = d_obj.log(domain_id=domain_id)
+        if status:
+            log = '\n'.join(data.get("log", []))
+            return HttpResponse(json.dumps(log))
+        else:
+            return HttpResponse(json.dumps(data))
+    else:
+        return HttpResponse(json.dumps(dict(code=1, message="please use get method!")))
+
+def domain_searchenginepush(request):
+    '''
+    是否开启搜索引擎推送
+    :return:
+    '''
+    d_obj = Domain()
+    if request.method == "GET":
+        domain_id = request.GET.get("domain_id", "")
+        status = request.GET.get("status", "")
+        status_val, data = d_obj.searchenginepush(domain_id=domain_id, status=status)
+        if status_val:
+            result = {"code": 0, "message": data['status']['message']}
+        else:
+            result = {"code": 1, "message": data}
+
+        return HttpResponseRedirect('/dnspod/?status={0}&message={1}'.
+                                    format(result.get("code", ""),
+                                           result.get("message", "")))
+    else:
+        return HttpResponse(json.dumps(dict(code=1, message="please use get method!")))
+
+def domain_remark(request):
+    '''
+    修改域名备注
+    :return:
+    '''
+    d_obj = Domain()
+    if request.method == "POST":
+        domain_id = request.POST.get("domain_id", "")
+        remark = request.POST.get("remark", "")
+        status, data = d_obj.remark(remark=remark, domain_id=domain_id)
+        if status:
+            result = {"code": 0, "message": data['status']['message']}
+        else:
+            result = {"code": 1, "message": data}
+
+        return HttpResponseRedirect('/dnspod/?status={0}&message={1}'.
+                                    format(result.get("code", ""),
+                                           result.get("message", "")))
+    else:
+        return HttpResponse(json.dumps(dict(code=1, message="please use post method!")))
+
+
+def domain_lock(request):
+    d_obj = Domain()
+    if request.method == "POST":
+        domain_id = request.POST.get("domain_id", "")
+        days = request.POST.get("days", "")
+        status, data = d_obj.lock(days=days, domain_id=domain_id)
+        if status:
+            result = {"code": 0, "message": '域名锁定成功，通过解锁码%s解锁，请妥善保管' % data['lock']['lock_code']}
+        else:
+            result = {"code": 1, "message": data}
+
+        return HttpResponseRedirect('/dnspod/?status={0}&message={1}'.
+                                    format(result.get("code", ""),
+                                           result.get("message", "")))
+    else:
+        return HttpResponse(json.dumps(dict(code=1, message="please use post method!")))
+
+# =====================域名分组================================
+def domain_changegroup(request):
+    '''
+    设置域名分组
+    :return:
+    '''
+    d_obj = Domain()
+    result = {}
+    domain_id = request.GET.get("domain_id", "")
+    group_id = request.GET.get("group_id", "")
+    print(domain_id,group_id)
+    status, data = d_obj.change_group(domain_id=domain_id, group_id=group_id)
+
+    return HttpResponse(json.dumps(status))
+
+def domain_addgroup(request):
+    '''
+    添加域名分组
+    :return:
+    '''
+    d_obj = Domain()
+    group_name = request.POST.get("group_name", "")
+
+    status, data = d_obj.group_create(group_name)
+    if status:
+        result = {"code": 0, "message": data['status']['message']}
+    else:
+        result = {"code": 1, "message": data}
+
+    return HttpResponseRedirect('/dnspod/?status={0}&message={1}'.
+                                format(result.get("code", ""),
+                                       result.get("message", "")))
+
+def domain_modgroup(request):
+    '''
+    mod域名分组
+    :return:
+    '''
+    d_obj = Domain()
+    group_id = request.POST.get("group_id", "")
+    group_name = request.POST.get("group_name", "")
+
+    status, data = d_obj.group_modify(group_id, group_name)
+    if status:
+        result = {"code": 0, "message": data['status']['message']}
+    else:
+        result = {"code": 1, "message": data}
+
+    return HttpResponseRedirect('/dnspod/?status={0}&message={1}'.
+                                format(result.get("code", ""),
+                                       result.get("message", "")))
+
+def domain_delgroup(request):
+    '''
+    删除域名分组
+    :return:
+    '''
+    d_obj = Domain()
+    group_id = request.GET.get("group_id", "")
+
+    status, data = d_obj.group_remove(group_id)
+    if status:
+        result = {"code": 0, "message": data['status']['message']}
+    else:
+        result = {"code": 1, "message": data}
+
+    return HttpResponseRedirect('/dnspod/?status={0}&message={1}'.
+                                format(result.get("code", ""),
+                                       result.get("message", "")))
 #=====================记录相关================================
 def dnspod_record(request):
     '''
