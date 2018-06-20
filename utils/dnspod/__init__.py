@@ -2,11 +2,11 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect
 from django.shortcuts import HttpResponse
 import json
-
+import time
 from utils.dnspod.domain import Domain
 from utils.dnspod import record
 from utils.dnspod import dmonitor
-
+from utils.mythread import MyThread
 __all__ = ['connect', 'dmonitor', 'domain', 'record', 'user']
 
 RESULT_CODE = {
@@ -492,6 +492,255 @@ def dnspod_d(request):
 
         return render(request,"dnspod_monitors.html",
                       {"monitors":monitors,"result":result},using='jinja2')
+
+
+
+def list_subdomain(request):
+    '''
+    列出包含A记录的所有子域名
+    :return:
+    '''
+    d_obj = Domain()
+    dm_obj = dmonitor.DMonitor()
+
+    domain_list = d_obj.list()
+
+    id_list = [d.get("id") for d in domain_list]
+
+    d2r_names = {}
+
+    # st = time.time()
+    li = []
+    for did in id_list:
+        t = MyThread(dm_obj.list_subdomain,args=(None,did))
+        li.append(t)
+        t.start()
+
+    for t in li:
+        t.join()  # 一定要join，不然主线程比子线程跑的快，会拿不到结果
+        status, data = t.get_result()
+        if status:
+            d_name = data.get("domain",{}).get("name","")
+            d_id = data.get("domain",{}).get("id","")
+            r_name = data.get("subdomain",[])
+            if r_name:
+                d2r_names[d_name] = dict(id=d_id,rnames=r_name)
+    # et = time.time()
+    # print et - st
+
+    # st = time.time()
+    # for did in id_list:
+    #     status,data = dm_obj.list_subdomain(domain_id=did)
+    #     if status:
+    #         d_name = data.get("domain",{}).get("name","")
+    #         d_id = data.get("domain",{}).get("id","")
+    #         r_name = data.get("subdomain",[])
+    #         if r_name:
+    #             d2r_names[d_name] = dict(id=d_id,rnames=r_name)
+    # et = time.time()
+    # print et - st
+
+    # print d2r_names
+    return HttpResponse(json.dumps(d2r_names))
+
+
+def list_subvalue(request):
+    '''
+    列出子域名的A记录
+    :return:
+    '''
+    dm_obj = dmonitor.DMonitor()
+
+    domain_id = request.GET.get("domain_id","") or request.POST.get("domain_id", "")
+
+    status, data = dm_obj.list_subdomain(domain_id=domain_id)
+    sub_domains = []
+
+    dic = {}
+    st = time.time()
+    if status:
+        r_name = data.get("subdomain",[])
+        for r in r_name:
+            t = MyThread(dm_obj.list_sub_value,args=(None,domain_id,r))
+            dic[r] = t
+            t.start()
+        for k,v in dic.items():
+            v.join()  # 一定要join，不然主线程比子线程跑的快，会拿不到结果
+            status, data = v.get_result()
+            if status:
+                s = dict(record_name=k,domain_name= data.get("domain").get("name"),
+                         id=data.get("records")[0].get("id"),points=data.get("points").get("list"))
+                sub_domains.append(s)
+    et = time.time()
+    # print et - st
+
+    # st = time.time()
+    # if status:
+    #     r_name = data.get("subdomain",[])
+    #     for r in r_name:
+    #         status, data = dm_obj.list_sub_value(domain_id=domain_id,subdomain=r)
+    #         if status:
+    #             s = dict(record_name=r,domain_name= data.get("domain").get("name"),
+    #                      id=data.get("records")[0].get("id"),points=data.get("points").get("list"))
+    #             sub_domains.append(s)
+    # et = time.time()
+    # print et - st
+
+    if request.method == "GET":
+        return HttpResponse(json.dumps(sub_domains))
+    else:
+        record_id = request.POST.get("record_id","")
+        for s in sub_domains:
+            if s['id'] == record_id:
+                # print s
+                return HttpResponse(json.dumps(s))
+
+
+def create_monitor(request):
+    '''
+    创建监控
+    :return:
+    '''
+    dm_obj = dmonitor.DMonitor()
+    result = {}
+    if request.method == "POST":
+        domain_id = request.POST.get("domain_id","")
+        record_id = request.POST.get("record_id","")
+        monitor_interval = int(request.POST.get("monitor_interval",""))
+        host = request.POST.get("host","")
+        port = request.POST.get("port", "")
+        monitor_path = request.POST.get("monitor_path","")
+        monitor_type = request.POST.get("monitor_type","")
+        points = request.POST.get("points","")
+        bak_ip = request.POST.get("bak_ip","")
+
+        # print domain_id,record_id,monitor_interval,host,port,monitor_path, monitor_type,points,bak_ip
+        try:
+            status,data = dm_obj.create(domain_id=domain_id,record_id=record_id,monitor_interval=monitor_interval,
+                                        host=host,port=port,monitor_path=monitor_path,
+                                        monitor_type=monitor_type,points=points,bak_ip=bak_ip)
+            if status:
+                result = {"code": 0, "message": data['status']['message']}
+            else:
+                result = {"code": 1, "message": data}
+        except Exception as e:
+            result = {"code": 1, "message": e}
+
+    return HttpResponseRedirect('/dnspod_d/?status={0}&message={1}'.
+                                format(result.get("code", ""),
+                                       result.get("message", "")))
+
+
+def remove_monitor(request):
+    '''
+    删除监控
+    :return:
+    '''
+    dm_obj = dmonitor.DMonitor()
+    monitor_id = request.GET.get("monitor_id","")
+    status,data = dm_obj.remove(monitor_id=monitor_id)
+    if status:
+        result = {"code": 0, "message": data['status']['message']}
+    else:
+        result = {"code": 1, "message": data}
+
+    return HttpResponseRedirect('/dnspod_d/?status={0}&message={1}'.
+                                format(result.get("code", ""),
+                                       result.get("message", "")))
+
+
+def monitor_info(request):
+    '''
+    获取监控信息
+    :return:
+    '''
+    dm_obj = dmonitor.DMonitor()
+    monitor_id = request.GET.get("monitor_id","")
+    status,data = dm_obj.info(monitor_id=monitor_id)
+    if status:
+        res = data.get("info")
+        return HttpResponse(json.dumps(res))
+    else:
+        return HttpResponse(json.dumps(data))
+
+
+def modify_monitor(request):
+    '''
+    修改监控
+    :return:
+    '''
+    #必选参数
+    result = {}
+    dm_obj = dmonitor.DMonitor()
+    if request.method == "POST":
+        monitor_id = request.POST.get("monitor_id","")
+        host = request.POST.get("host","")
+        monitor_path = request.POST.get("monitor_path","")
+        port = request.POST.get("port","")
+        monitor_interval = int(request.POST.get("monitor_interval",""))
+        monitor_type = request.POST.get("monitor_type","")
+        points = request.POST.getlist("points")
+        bak_ip = request.POST.get("bak_ip","")
+        #可选参数
+        keep_ttl = request.POST.get("keep_ttl","")
+        sms_notice = request.POST.get("sms_notice","")
+        email_notice = request.POST.get("email_notice","")
+        less_notice = request.POST.get("less_notice", "")
+        callback_url = request.POST.get("callback_url","")
+        callback_key = request.POST.get("callback_key","")
+
+        # print monitor_id,monitor_interval,host,port,monitor_path, monitor_type,points,bak_ip,keep_ttl,\
+        #     sms_notice,email_notice,less_notice,callback_url,callback_key
+
+        status,data = dm_obj.modify(monitor_id=monitor_id,host=host,monitor_path=monitor_path,
+                                    port=port,monitor_interval=monitor_interval,monitor_type=monitor_type,
+                                    points=points,bak_ip=bak_ip,
+                                    keep_ttl=keep_ttl,sms_notice=sms_notice,email_notice=email_notice,
+                                    less_notice=less_notice,callback_url=callback_url,callback_key=callback_key)
+        if status:
+            result = {"code": 0, "message": data['status']['message']}
+        else:
+            result = {"code": 1, "message": data}
+
+    return HttpResponseRedirect('/dnspod_d/?status={0}&message={1}'.
+                                format(result.get("code", ""),
+                                       result.get("message", "")))
+
+
+def setstatus_monitor(request):
+    '''
+    设置监控状态
+    :return:
+    '''
+    result = {}
+    dm_obj = dmonitor.DMonitor()
+    if request.method == "GET":
+        status =  request.GET.get("status","")
+        monitor_id = request.GET.get("monitor_id","")
+        status_val,data = dm_obj.set_status(monitor_id=monitor_id,status=status)
+
+        if status_val:
+            result = {"code": 0, "message": data['status']['message']}
+        else:
+            result = {"code": 1, "message": data}
+
+    return HttpResponseRedirect('/dnspod_d/?status={0}&message={1}'.
+                                format(result.get("code", ""),
+                                       result.get("message", "")))
+
+
+def getdowns_monitor(request):
+    '''
+    获取监控警告
+    :return:
+    '''
+    result = {}
+    dm_obj = dmonitor.DMonitor()
+
+    if request.method == "GET":
+        status,data = dm_obj.get_downs()
+        return HttpResponse(json.dumps(data))
+
 
 def gethistory_monitor(request):
     '''

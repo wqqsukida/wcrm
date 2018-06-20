@@ -170,6 +170,14 @@ VALID_URL= [
     '^/dnspod_record/record_remark',
     '^/dnspod_d/',
     '^/dnspod_d/gethistory_monitor/',
+    '^/dnspod_d/list_subdomain',
+    '^/dnspod_d/list_subvalue',
+    '^/dnspod_d/create_monitor',
+    '^/dnspod_d/remove_monitor',
+    '^/dnspod_d/monitor_info',
+    '^/dnspod_d/modify_monitor',
+    '^/dnspod_d/setstatus_monitor',
+    '^/dnspod_d/getdowns_monitor',
 ]
 
 #===============falcon-api====================
