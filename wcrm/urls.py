@@ -17,7 +17,7 @@ from django.conf.urls import url,include
 from django.contrib import admin
 from arya.service import v1
 from crm import views
-
+from utils import dnspod
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
@@ -30,19 +30,24 @@ urlpatterns = [
     url(r'^machines_dash/', views.machines_dash),
     url(r'^userinfo/', views.userinfo),
     url(r'^get_cert_detail/', views.get_cert_detail),
-    url(r'^dnspod/add_domain', views.add_domain),
-    url(r'^dnspod/del_domain', views.del_domain),
-    url(r'^dnspod/domain_status', views.domain_status),
-    url(r'^dnspod/domain_log', views.domain_log),
-    url(r'^dnspod/domain_searchenginepush', views.domain_searchenginepush),
-    url(r'^dnspod/domain_remark', views.domain_remark),
-    url(r'^dnspod/domain_lock', views.domain_lock),
-    url(r'^dnspod/domain_changegroup', views.domain_changegroup),
-    url(r'^dnspod/domain_addgroup', views.domain_addgroup),
-    url(r'^dnspod/domain_modgroup', views.domain_modgroup),
-    url(r'^dnspod/domain_delgroup', views.domain_modgroup),
-    url(r'^dnspod/', views.dnspod,name='dnspod'),
-    url(r'^dnspod_record/', views.dnspod_record),
-    url(r'^dnspod_d/$', views.dnspod_d),
-    url(r'^dnspod_d/gethistory_monitor/', views.gethistory_monitor),
+    url(r'^dnspod/add_domain', dnspod.add_domain),
+    url(r'^dnspod/del_domain', dnspod.del_domain),
+    url(r'^dnspod/domain_status', dnspod.domain_status),
+    url(r'^dnspod/domain_log', dnspod.domain_log),
+    url(r'^dnspod/domain_searchenginepush', dnspod.domain_searchenginepush),
+    url(r'^dnspod/domain_remark', dnspod.domain_remark),
+    url(r'^dnspod/domain_lock', dnspod.domain_lock),
+    url(r'^dnspod/domain_changegroup', dnspod.domain_changegroup),
+    url(r'^dnspod/domain_addgroup', dnspod.domain_addgroup),
+    url(r'^dnspod/domain_modgroup', dnspod.domain_modgroup),
+    url(r'^dnspod/domain_delgroup', dnspod.domain_modgroup),
+    url(r'^dnspod/', dnspod.dnspod,name='dnspod'),
+    url(r'^dnspod_record/add_record', dnspod.add_record),
+    url(r'^dnspod_record/del_record', dnspod.del_record),
+    url(r'^dnspod_record/mod_record', dnspod.mod_record),
+    url(r'^dnspod_record/record_status', dnspod.record_status),
+    url(r'^dnspod_record/record_remark', dnspod.record_remark),
+    url(r'^dnspod_record/', dnspod.dnspod_record),
+    url(r'^dnspod_d/$', dnspod.dnspod_d),
+    url(r'^dnspod_d/gethistory_monitor/', dnspod.gethistory_monitor),
 ]

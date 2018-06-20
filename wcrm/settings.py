@@ -163,6 +163,11 @@ VALID_URL= [
     '^/dnspod/domain_modgroup',
     '^/dnspod/domain_delgroup',
     '^/dnspod_record/',
+    '^/dnspod_record/add_record',
+    '^/dnspod_record/del_record',
+    '^/dnspod_record/mod_record',
+    '^/dnspod_record/record_status',
+    '^/dnspod_record/record_remark',
     '^/dnspod_d/',
     '^/dnspod_d/gethistory_monitor/',
 ]
