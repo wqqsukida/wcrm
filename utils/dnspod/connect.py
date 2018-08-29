@@ -10,8 +10,6 @@ class Public(object):
     '''公共方法，用于连接以及发送请求到Dnspod'''
 
     def __init__(self, token='45694,120fff0b9321cfcbb6aeccb647af9131'): # wuyifei
-    # def __init__(self, token=DNSPOD_TOKEN): # gome
-    # def __init__(self, token='47142,5c94b8cfd8204cca2c269acdec91eb03'): # zwhset
         self.params = dict(login_token=token,
                          format='json',
                          lang='cn',
