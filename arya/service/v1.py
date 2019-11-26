@@ -30,9 +30,10 @@ class ChangeList(object):
         pager_page_count = config.pager_page_count
         all_count = queryset.count()
         base_url = config.reverse_list_url()
+        # print('base_url',base_url)
         page_obj = Pagination(current_page,all_count,base_url,query_params,per_page,pager_page_count)
-        self.queryset = queryset # [page_obj.start:page_obj.end] # 利用了前端进行分页处理
-        self.page_html = None # page_obj.page_html() # 利用了前端进行分页处理
+        self.queryset = queryset[page_obj.start:page_obj.end] # 利用了前端进行分页处理(修改为后端分页)
+        self.page_html = page_obj.page_html() # 利用了前端进行分页处理(修改为后端分页)
 
     def table_header(self):
         data = []

@@ -50,6 +50,7 @@ class RbacMiddleware(MiddlewareMixin):
         }
         """
         permission_dict = request.session.get(settings.PERMISSION_URL_DICT_KEY)
+        # print(permission_dict)
         if not permission_dict:
             return redirect('/login/')
 
@@ -59,6 +60,8 @@ class RbacMiddleware(MiddlewareMixin):
                 regax = "^{0}$".format(db_url)
                 # 用当前访问url匹配permission_dict中对应url的,，获取code list
                 if re.match(regax, current_url):
+                    # print(regax)
+                    # print(current_url)
                     # 获取当前用户对当前组内的所有code，并赋值给request
                     request.permission_code_list = code_url['codes']
                     flag = True

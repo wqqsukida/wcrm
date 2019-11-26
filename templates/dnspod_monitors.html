@@ -90,6 +90,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% if monitors %}
                                 {%for m in monitors %}
                                     <tr>
                                         <td>
@@ -145,6 +146,7 @@
                                         </td>
                                     </tr>
                                 {%endfor%}
+                                {% endif %}
                                 </tbody>
                                 <tfoot>
                                     <tr>

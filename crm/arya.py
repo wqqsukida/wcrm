@@ -262,7 +262,7 @@ class BussinessLineConfig(Permission_Config,v1.AryaConfig):
 
 v1.site.register(models.BussinessLine, BussinessLineConfig)
 
-########################### BussinessLine ###########################
+########################### DomainTop ###########################
 class DomainTopModelForm(ModelForm):
     class Meta:
         model = models.DomainTop
