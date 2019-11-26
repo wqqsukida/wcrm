@@ -7,7 +7,7 @@ host = "http://192.168.67.129:4000/sender/mail"
 
 hearders = {
     "Content-Type": "application/json",
-    'tos':'wuyifei@gomeholdings.com',
+    'tos':'wuyifei@163.com',
     'subject':'test',
     'content':'test',
 }
