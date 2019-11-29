@@ -51,6 +51,7 @@ class RbacMiddleware(MiddlewareMixin):
         """
         permission_dict = request.session.get(settings.PERMISSION_URL_DICT_KEY)
         # print(permission_dict)
+        # 登陆验证
         if not permission_dict:
             return redirect('/login/')
 
@@ -68,6 +69,6 @@ class RbacMiddleware(MiddlewareMixin):
                     break
             if flag:
                 break
-
+        # 权限验证
         if not flag:
             return redirect('/403/')

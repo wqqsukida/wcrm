@@ -51,7 +51,7 @@ def init_permission(user,request):
     }
 
     """
-    result = {}
+    result = {0:{'urls':['/index_v3/','/index/','/'],'codes':[]}}
     for item in  permission_list:
         group_id = item['permissions__group_id']
         code = item['permissions__code']
